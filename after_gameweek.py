@@ -40,7 +40,7 @@ def get_players_with_points(gameweek=curr_gameweek):
     return players_df[['full_name','gw_points']]
 
 df_ = get_players_with_points()
-X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/X_{curr_gameweek}.csv")
+X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv")
 filtered = df_[df_['full_name'].isin(X['full_name'])]
 
 filtered.to_csv(f'/home/tars/Projects/fpl-oracle/data/y_{curr_gameweek}.csv', index=False)
