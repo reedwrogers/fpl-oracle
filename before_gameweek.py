@@ -5,7 +5,7 @@ import requests
 from thefuzz import process
 import warnings
 
-curr_gameweek = 12
+curr_gameweek = 13
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
