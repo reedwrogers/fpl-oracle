@@ -1,0 +1,90 @@
+[01/02/26 05:00:01] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  20
+The gameweek has already been grabbed.
+[01/03/26 05:00:01] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  20
+The gameweek has already been grabbed.
+[01/04/26 05:00:02] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  21
+                    INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/04/26 05:00:04] INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/04/26 05:02:13] INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/05/26 05:00:02] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  21
+The gameweek has already been grabbed.
+[01/06/26 05:00:02] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  21
+The gameweek has already been grabbed.
+[01/07/26 05:00:01] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  22
+[01/07/26 05:00:02] INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/07/26 05:00:03] INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/07/26 05:02:11] INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/08/26 05:00:01] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  22
+The gameweek has already been grabbed.
+[01/09/26 05:00:01] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  22
+The gameweek has already been grabbed.

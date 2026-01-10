@@ -56,7 +56,7 @@ def get_fixtures(week_wanted):
 
     return schedule[['home_team','away_team','week']]
 
-def get_fbref_player_stats(season='2025-2026',pt_threshold=40):
+def get_fbref_player_stats(season='2025-2026',pt_threshold=60):
     """
     grabs all player individual statistics that we want
     """
