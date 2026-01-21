@@ -462,3 +462,150 @@ Traceback (most recent call last):
   File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/soccerdata/_common.py", line 553, in _download_and_save
     raise ConnectionError(f"Could not download {url}.")
 ConnectionError: Could not download https://fbref.com/en/squads/18bb7c10/2025-2026/matchlogs/all_comps/schedule.
+[01/20/26 05:00:02] INFO     No custom team name replacements      _config.py:91
+                             found. You can configure these in                  
+                             /home/tars/soccerdata/config/teamname              
+                             _replacements.json.                                
+                    INFO     No custom league dict found. You can _config.py:197
+                             configure additional leagues in                    
+                             /home/tars/soccerdata/config/league_               
+                             dict.json.                                         
+The current gameweek is:  23
+[01/20/26 05:00:04] INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/20/26 05:00:05] INFO     Saving cached data to                _common.py:263
+                             /home/tars/soccerdata/data/FBref                   
+[01/20/26 05:00:12] ERROR    Error while scraping                 _common.py:545
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule. Retrying... (attempt 1 of 5).                 
+                             Traceback (most recent call last):                 
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/soc               
+                             cerdata/_common.py", line 525, in                  
+                             _download_and_save                                 
+                                 response.raise_for_status()                    
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/req               
+                             uests/models.py", line 1026, in                    
+                             raise_for_status                                   
+                                 raise HTTPError(http_error_msg,                
+                             response=self)                                     
+                             requests.exceptions.HTTPError: 403                 
+                             Client Error: Forbidden for url:                   
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule                                                
+[01/20/26 05:00:18] ERROR    Error while scraping                 _common.py:545
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule. Retrying... (attempt 2 of 5).                 
+                             Traceback (most recent call last):                 
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/soc               
+                             cerdata/_common.py", line 525, in                  
+                             _download_and_save                                 
+                                 response.raise_for_status()                    
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/req               
+                             uests/models.py", line 1026, in                    
+                             raise_for_status                                   
+                                 raise HTTPError(http_error_msg,                
+                             response=self)                                     
+                             requests.exceptions.HTTPError: 403                 
+                             Client Error: Forbidden for url:                   
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule                                                
+[01/20/26 05:00:24] ERROR    Error while scraping                 _common.py:545
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule. Retrying... (attempt 3 of 5).                 
+                             Traceback (most recent call last):                 
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/soc               
+                             cerdata/_common.py", line 525, in                  
+                             _download_and_save                                 
+                                 response.raise_for_status()                    
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/req               
+                             uests/models.py", line 1026, in                    
+                             raise_for_status                                   
+                                 raise HTTPError(http_error_msg,                
+                             response=self)                                     
+                             requests.exceptions.HTTPError: 403                 
+                             Client Error: Forbidden for url:                   
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule                                                
+[01/20/26 05:00:31] ERROR    Error while scraping                 _common.py:545
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule. Retrying... (attempt 4 of 5).                 
+                             Traceback (most recent call last):                 
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/soc               
+                             cerdata/_common.py", line 525, in                  
+                             _download_and_save                                 
+                                 response.raise_for_status()                    
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/req               
+                             uests/models.py", line 1026, in                    
+                             raise_for_status                                   
+                                 raise HTTPError(http_error_msg,                
+                             response=self)                                     
+                             requests.exceptions.HTTPError: 403                 
+                             Client Error: Forbidden for url:                   
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule                                                
+[01/20/26 05:00:37] ERROR    Error while scraping                 _common.py:545
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule. Retrying... (attempt 5 of 5).                 
+                             Traceback (most recent call last):                 
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/soc               
+                             cerdata/_common.py", line 525, in                  
+                             _download_and_save                                 
+                                 response.raise_for_status()                    
+                               File                                             
+                             "/home/tars/Projects/fpl-oracle/venv               
+                             311/lib/python3.11/site-packages/req               
+                             uests/models.py", line 1026, in                    
+                             raise_for_status                                   
+                                 raise HTTPError(http_error_msg,                
+                             response=self)                                     
+                             requests.exceptions.HTTPError: 403                 
+                             Client Error: Forbidden for url:                   
+                             https://fbref.com/en/squads/18bb7c10               
+                             /2025-2026/matchlogs/all_comps/sched               
+                             ule                                                
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data.py", line 396, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data.py", line 320, in join_it_all_together
+    df_teams = get_teams()
+               ^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data.py", line 161, in get_teams
+    matches = fbref.read_team_match_stats(stat_type="schedule", team=team)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/soccerdata/fbref.py", line 461, in read_team_match_stats
+    reader = self.get(url, filepath, no_cache=current_season and not force_cache)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/soccerdata/_common.py", line 306, in get
+    return self._download_and_save(url, filepath, var)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/soccerdata/_common.py", line 553, in _download_and_save
+    raise ConnectionError(f"Could not download {url}.")
+ConnectionError: Could not download https://fbref.com/en/squads/18bb7c10/2025-2026/matchlogs/all_comps/schedule.
