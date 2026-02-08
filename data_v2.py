@@ -39,7 +39,7 @@ def get_next_gameweek():
 
     return int(next_gw.iloc[0]) 
 
-curr_gameweek = get_next_gameweek()
+curr_gameweek = get_next_gameweek()-1 # returns the actual current gameweek. If it is about to be 25, returns 25
 
 def get_fixtures(week_wanted):
     """
@@ -495,18 +495,22 @@ def get_players_with_points(gameweek=curr_gameweek-1):
 
 print("The current gameweek is: ",curr_gameweek)
 
+
 gameweeks_seen = get_gameweeks_seen("/home/tars/Projects/fpl-oracle/data")
+
+# If we SEE 26, that means 25 is occuring. Thus, we should get y_24, x_25...
 
 if curr_gameweek in gameweeks_seen:
     print("The gameweek has already been grabbed.")
 else:
     # get the before gameweek data..
+    
+    # X
     df = join_it_all_together()
     df.to_csv(f'/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv', index=False)
-
-    # get the after last gameweek data... need to specifically put this in for now because we missed a GW
-    if curr_gameweek != 24:
-        df_ = get_players_with_points()
-        X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek-1}.csv")
-        filtered = df_[df_['full_name'].isin(X['full_name'])]
-        filtered.to_csv(f'/home/tars/Projects/fpl-oracle/data/y_{curr_gameweek-1}.csv', index=False)
+    
+    # Y
+    df_ = get_players_with_points()
+    X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv")
+    filtered = df_[df_['full_name'].isin(X['full_name'])]
+    filtered.to_csv(f'/home/tars/Projects/fpl-oracle/data/y_{curr_gameweek-1}.csv', index=False)
