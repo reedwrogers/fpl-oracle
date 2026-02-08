@@ -756,3 +756,29 @@ Traceback (most recent call last):
   File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/soccerdata/_common.py", line 553, in _download_and_save
     raise ConnectionError(f"Could not download {url}.")
 ConnectionError: Could not download https://fbref.com/en/squads/18bb7c10/2025-2026/matchlogs/all_comps/schedule.
+The current gameweek is:  25
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v2.py", line 510, in <module>
+    X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek-1}.csv")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/tars/Projects/fpl-oracle/data/X_24.csv'
+The current gameweek is:  25
+The gameweek has already been grabbed.
+The current gameweek is:  25
+The gameweek has already been grabbed.
+The current gameweek is:  26
