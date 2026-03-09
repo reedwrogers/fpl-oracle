@@ -463,7 +463,7 @@ def join_it_all_together():
 
 def get_players_with_points(gameweek=curr_gameweek-1):
     """
-    Returns FPL players + their total points for a specific gameweek.
+    Returns FPL players + their total points and minutes for a specific gameweek.
     """
     url = "https://fantasy.premierleague.com/api/bootstrap-static/"
     response = requests.get(url)
@@ -480,6 +480,8 @@ def get_players_with_points(gameweek=curr_gameweek-1):
     players_df['full_name'] = players_df['first_name'] + " " + players_df['second_name']
 
     points_list = []
+    minutes_list = []
+    
     for pid in players_df['id']:
         p_url = f"https://fantasy.premierleague.com/api/element-summary/{pid}/"
         p_data = requests.get(p_url).json()
@@ -487,11 +489,18 @@ def get_players_with_points(gameweek=curr_gameweek-1):
         history = p_data.get("history", [])
         gw_record = next((gw for gw in history if gw["round"] == gameweek), None)
 
-        points_list.append(gw_record["total_points"] if gw_record else 0)
+        if gw_record:
+            points_list.append(gw_record["total_points"])
+            minutes_list.append(gw_record["minutes"])
+        else:
+            points_list.append(0)
+            minutes_list.append(0)
 
     players_df["gw_points"] = points_list
+    players_df["gw_minutes"] = minutes_list
     
-    return players_df[['full_name','gw_points']]
+    return players_df[['full_name', 'gw_points', 'gw_minutes']]
+
 
 print("The current gameweek is: ",curr_gameweek)
 

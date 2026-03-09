@@ -117,6 +117,112 @@ def get_fpl_defensive_stats():
     return pd.DataFrame(defensive_stats)
 
 
+def get_fpl_recent_stats():
+    """
+    Gets recent form stats (last 3 games) and ICT index for all FPL players.
+    Returns: points_last_3, xg_last_3, minutes_last_3, is_penalty_taker, 
+             ownership_percent, influence, creativity, threat, ict_index
+    """
+    url = "https://fantasy.premierleague.com/api/bootstrap-static/"
+    response = requests.get(url)
+    data = response.json()
+    
+    players = pd.DataFrame(data['elements'])
+    teams = pd.DataFrame(data['teams'])
+    
+    recent_stats = []
+    
+    for pid in players['id']:
+        try:
+            p_url = f"https://fantasy.premierleague.com/api/element-summary/{pid}/"
+            p_data = requests.get(p_url).json()
+            
+            history = p_data.get("history", [])
+            
+            # Get player info from bootstrap
+            player_info = players[players['id'] == pid].iloc[0]
+            full_name = f"{player_info['first_name']} {player_info['second_name']}"
+            
+            # Get last 3 gameweeks stats
+            last_3 = history[-3:] if len(history) >= 3 else history
+            
+            points_last_3 = sum(gw.get('total_points', 0) for gw in last_3)
+            xg_last_3 = round(sum(float(gw.get('expected_goals', 0)) for gw in last_3), 2)
+            minutes_last_3 = sum(gw.get('minutes', 0) for gw in last_3)
+            
+            # Get ICT index components (these are season totals from bootstrap)
+            influence = float(player_info.get('influence', 0))
+            creativity = float(player_info.get('creativity', 0))
+            threat = float(player_info.get('threat', 0))
+            ict_index = float(player_info.get('ict_index', 0))
+            
+            # Penalty taker status (from penalties_order in bootstrap)
+            is_penalty_taker = 1 if player_info.get('penalties_order', 0) in [1, 2] else 0
+            
+            # Ownership percentage
+            ownership_percent = float(player_info.get('selected_by_percent', 0))
+            
+            recent_stats.append({
+                'full_name': full_name,
+                'points_last_3': points_last_3,
+                'xg_last_3': xg_last_3,
+                'minutes_last_3': minutes_last_3,
+                'is_penalty_taker': is_penalty_taker,
+                'ownership_percent': ownership_percent,
+                'influence': influence,
+                'creativity': creativity,
+                'threat': threat,
+                'ict_index': ict_index
+            })
+            
+        except Exception as e:
+            print(f"Error processing player {pid}: {e}")
+            continue
+    
+    return pd.DataFrame(recent_stats)
+
+
+def get_opponent_goals_conceded():
+    """
+    Gets goals conceded in last 3 games for each team.
+    """
+    url = "https://fantasy.premierleague.com/api/bootstrap-static/"
+    data = requests.get(url).json()
+    
+    teams = pd.DataFrame(data['teams'])
+    
+    fixtures_url = "https://fantasy.premierleague.com/api/fixtures/"
+    fixtures_data = requests.get(fixtures_url).json()
+    fixtures = pd.DataFrame(fixtures_data)
+    
+    # Filter for finished fixtures only
+    fixtures = fixtures[fixtures['finished'] == True]
+    
+    team_goals_conceded = []
+    
+    for team_id in teams['id']:
+        # Get last 3 fixtures for this team
+        team_fixtures = fixtures[
+            (fixtures['team_h'] == team_id) | (fixtures['team_a'] == team_id)
+        ].sort_values('event', ascending=False).head(3)
+        
+        goals_conceded = 0
+        for _, fixture in team_fixtures.iterrows():
+            if fixture['team_h'] == team_id:
+                goals_conceded += fixture['team_a_score']
+            else:
+                goals_conceded += fixture['team_h_score']
+        
+        team_name = teams[teams['id'] == team_id].iloc[0]['name']
+        
+        team_goals_conceded.append({
+            'team_name': team_name,
+            'goals_conceded_last_3': goals_conceded
+        })
+    
+    return pd.DataFrame(team_goals_conceded)
+
+
 def get_understat_player_stats(season='2025', pt_threshold=60):
     """
     grabs all player individual statistics that we want
@@ -397,12 +503,17 @@ def join_it_all_together():
     df_understat = get_understat_player_stats()
     df_teams = get_understat_teams()
     df_defensive = get_fpl_defensive_stats()
+    df_recent = get_fpl_recent_stats()  # NEW: Get recent form and ICT stats
+    df_goals_conceded = get_opponent_goals_conceded()  # NEW: Get goals conceded
+    
     df_fuz = fuzzy_match(df_fpl, df_understat)
 
     df_fuz = df_fuz.merge(df_defensive, on='full_name', how='left')
+    df_fuz = df_fuz.merge(df_recent, on='full_name', how='left')  # NEW: Merge recent stats
 
     df_fuz["team_name"] = df_fuz["team_name"].replace(TEAM_TEST_MAP)
     df_teams["team_name"] = df_teams["team_name"].replace(TEAM_TEST_MAP)
+    df_goals_conceded["team_name"] = df_goals_conceded["team_name"].replace(TEAM_TEST_MAP)  # NEW
     
     df = df_fuz.merge(df_teams, left_on="team_name", right_on="team_name", how="left")
 
@@ -429,6 +540,15 @@ def join_it_all_together():
         suffixes=('', '_opp')
     )
     
+    # NEW: Merge opponent goals conceded
+    df = df.merge(
+        df_goals_conceded[['team_name', 'goals_conceded_last_3']],
+        left_on='opponent_team',
+        right_on='team_name',
+        how='left',
+        suffixes=('', '_opp_gc')
+    )
+    
     standings = get_fpl_table()
     df = df.merge(
         standings[['team_name', 'position']],
@@ -447,18 +567,23 @@ def join_it_all_together():
         'position_y': 'team_league_position',
         'team_xg_per_90_opp': 'opponent_xg_per_90',
         'team_xg_against_per_90_opp': 'opponent_xg_against_per_90',
-        'position': 'opponent_league_position'
+        'position': 'opponent_league_position',
+        'goals_conceded_last_3': 'opponent_goals_conceded_last_3'  # NEW
     })
     
     df = df.loc[:, ~df.columns.duplicated()]
     
+    # Updated return with all new columns
     return df[['full_name', 'team_name', 'player_position', 'current_fpl_cost', 
                'playing_time_min_percentage', 'xg_per_90', 'xag_per_90',
                'yellows_per_90', 'reds_per_90', 
                'clearances_blocks_interceptions_per_90', 'tackles_per_90', 
                'team_xg_per_90', 'team_xg_against_per_90', 
                'opponent_xg_per_90', 'opponent_xg_against_per_90', 'opponent_league_position',
-               'gameweek', 'is_at_home', 'team_league_position']]
+               'gameweek', 'is_at_home', 'team_league_position',
+               'points_last_3', 'xg_last_3', 'minutes_last_3',  # NEW
+               'is_penalty_taker', 'opponent_goals_conceded_last_3', 'ownership_percent',  # NEW
+               'influence', 'creativity', 'threat', 'ict_index']]  # NEW: ICT Index
 
 
 def get_players_with_points(gameweek=curr_gameweek-1):
