@@ -1,5 +1,6 @@
-distutils
 soccerdata
 pandas
 numpy
+scikit-learn
+scipy
 thefuzz
