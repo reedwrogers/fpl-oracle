@@ -1,6 +1,8 @@
-soccerdata
 pandas
 numpy
 scikit-learn
 scipy
 thefuzz
+understatapi
+requests
+pulp

@@ -1,13 +1,39 @@
+import re
 import requests
 import pandas as pd
 from pathlib import Path
-import pandas as pd
 from datetime import datetime
-import requests
 from thefuzz import process
-import warnings
-import re
 from understatapi import UnderstatClient
+
+UNDERSTAT_SEASON = "2026"
+
+TEAM_TEST_MAP = {
+    "Manchester United": "Man Utd",
+    "Manchester City": "Man City",
+    "Tottenham Hotspur": "Spurs",
+    "Tottenham": "Spurs",
+    "Nott'ham Forest": "\"Nottham Forest\"",
+    "Nottingham Forest": "\"Nottham Forest\"",
+    "Nott'm Forest": "\"Nottham Forest\"",
+    "Newcastle United": "Newcastle",
+    "Leeds United": "Leeds",
+    "Brighton and Hove Albion": "Brighton",
+    "Wolverhampton Wanderers": "Wolves",
+    "West Ham United": "West Ham",
+    "Aston Villa": "Aston Villa",
+    "Sheffield United": "Sheffield Utd",
+    "Ipswich Town": "Ipswich",
+    "Coventry City": "Coventry",
+    "Hull City": "Hull",
+}
+
+UNDERSTAT_TEAMS = [
+    "Manchester City", "Arsenal", "Liverpool", "Aston Villa", "Tottenham",
+    "Chelsea", "Newcastle United", "Manchester United", "West Ham",
+    "Crystal Palace", "Brighton", "Bournemouth", "Fulham", "Wolverhampton Wanderers",
+    "Everton", "Brentford", "Nottingham Forest", "Ipswich", "Coventry", "Hull",
+]
 
 def get_gameweeks_seen(data_dir="/data"):
     """
@@ -223,7 +249,7 @@ def get_opponent_goals_conceded():
     return pd.DataFrame(team_goals_conceded)
 
 
-def get_understat_player_stats(season='2025', pt_threshold=60):
+def get_understat_player_stats(season=UNDERSTAT_SEASON, pt_threshold=60):
     """
     grabs all player individual statistics that we want
     """
@@ -312,22 +338,16 @@ def get_understat_player_stats(season='2025', pt_threshold=60):
     
     return df_understat[['player_name','playing_time_min_percentage','xg_per_90','xag_per_90','yellows_per_90','reds_per_90']] 
 
-def get_understat_teams(season="2026"):
+def get_understat_teams(season=UNDERSTAT_SEASON):
     """
     Returns xG statistics for all Premier League teams for games up to today.
     """
-    
+
     teams_data = []
-    team_names = [
-        'Manchester City', 'Arsenal', 'Liverpool', 'Aston Villa', 'Tottenham',
-        'Chelsea', 'Newcastle United', 'Manchester United', 'West Ham',
-        'Crystal Palace', 'Brighton', 'Bournemouth', 'Fulham', 'Wolverhampton Wanderers',
-        'Everton', 'Brentford', 'Nottingham Forest', 'Sunderland', 'Burnley', 'Leeds'
-    ]
-    
+
     today = datetime.now()
-    
-    for team_name in team_names:
+
+    for team_name in UNDERSTAT_TEAMS:
         try:
             with UnderstatClient() as understat:
                 team_data = understat.team(team=team_name).get_match_data(season=season)
@@ -422,49 +442,15 @@ def get_fpl_table():
 
     teams = pd.DataFrame(data["teams"])[["name", "short_name", "position"]]
 
-    name_map = {
-        "Manchester United": "Man Utd",
-        "Manchester City": "Man City",
-        "Tottenham Hotspur": "Spurs",
-        "Tottenham": "Spurs",
-        "Nott'ham Forest": "\"Nottham Forest\"",
-        "Nottingham Forest": "\"Nottham Forest\"",
-        "Nott'm Forest": "\"Nottham Forest\"",
-        "Newcastle United": "Newcastle",
-        "Leeds United": "Leeds",
-        "Brighton and Hove Albion": "Brighton",
-        "Wolverhampton Wanderers": "Wolves",
-        "West Ham United": "West Ham",
-        "Aston Villa": "Aston Villa",
-        "Sheffield United": "Sheffield Utd",
-    }
-
-    teams["team_name"] = teams["name"].replace(name_map)
+    teams["team_name"] = teams["name"].replace(TEAM_TEST_MAP)
 
     return teams[["team_name", "position"]]
 
 def get_fixtures_and_league_spots(gameweek=curr_gameweek):
     fixtures = get_fixtures(gameweek)
-    
-    name_map = {
-        "Manchester United": "Man Utd",
-        "Manchester City": "Man City",
-        "Tottenham Hotspur": "Spurs",
-        "Tottenham": "Spurs",
-        "Nott'ham Forest": "\"Nottham Forest\"",
-        "Nottingham Forest": "\"Nottham Forest\"",
-        "Nott'm Forest": "\"Nottham Forest\"",
-        "Newcastle United": "Newcastle",
-        "Leeds United": "Leeds",
-        "Brighton and Hove Albion": "Brighton",
-        "Wolverhampton Wanderers": "Wolves",
-        "West Ham United": "West Ham",
-        "Aston Villa": "Aston Villa",
-        "Sheffield United": "Sheffield Utd",
-    }
 
-    fixtures['home_team'] = fixtures['home_team'].replace(name_map)
-    fixtures['away_team'] = fixtures['away_team'].replace(name_map)
+    fixtures['home_team'] = fixtures['home_team'].replace(TEAM_TEST_MAP)
+    fixtures['away_team'] = fixtures['away_team'].replace(TEAM_TEST_MAP)
 
     home_df = fixtures[["home_team", "week"]].rename(columns={"home_team": "team"})
     home_df["home"] = 1
@@ -482,38 +468,21 @@ def get_fixtures_and_league_spots(gameweek=curr_gameweek):
     return final.sort_values("position")
 
 def join_it_all_together():
-    TEAM_TEST_MAP = {
-        "Manchester United": "Man Utd",
-        "Manchester City": "Man City",
-        "Tottenham Hotspur": "Spurs",
-        "Tottenham": "Spurs",
-        "Nott'ham Forest": "\"Nottham Forest\"",
-        "Nottingham Forest": "\"Nottham Forest\"",
-        "Nott'm Forest": "\"Nottham Forest\"",
-        "Newcastle United": "Newcastle",
-        "Leeds United": "Leeds",
-        "Brighton and Hove Albion": "Brighton",
-        "Wolverhampton Wanderers": "Wolves",
-        "West Ham United": "West Ham",
-        "Aston Villa": "Aston Villa",
-        "Sheffield United": "Sheffield Utd",
-    }
-
     df_fpl = get_fpl_players()
     df_understat = get_understat_player_stats()
     df_teams = get_understat_teams()
     df_defensive = get_fpl_defensive_stats()
-    df_recent = get_fpl_recent_stats()  # NEW: Get recent form and ICT stats
-    df_goals_conceded = get_opponent_goals_conceded()  # NEW: Get goals conceded
+    df_recent = get_fpl_recent_stats()
+    df_goals_conceded = get_opponent_goals_conceded()
     
     df_fuz = fuzzy_match(df_fpl, df_understat)
 
     df_fuz = df_fuz.merge(df_defensive, on='full_name', how='left')
-    df_fuz = df_fuz.merge(df_recent, on='full_name', how='left')  # NEW: Merge recent stats
+    df_fuz = df_fuz.merge(df_recent, on='full_name', how='left')
 
     df_fuz["team_name"] = df_fuz["team_name"].replace(TEAM_TEST_MAP)
     df_teams["team_name"] = df_teams["team_name"].replace(TEAM_TEST_MAP)
-    df_goals_conceded["team_name"] = df_goals_conceded["team_name"].replace(TEAM_TEST_MAP)  # NEW
+    df_goals_conceded["team_name"] = df_goals_conceded["team_name"].replace(TEAM_TEST_MAP)
     
     df = df_fuz.merge(df_teams, left_on="team_name", right_on="team_name", how="left")
 
@@ -540,7 +509,7 @@ def join_it_all_together():
         suffixes=('', '_opp')
     )
     
-    # NEW: Merge opponent goals conceded
+    # Merge opponent goals conceded
     df = df.merge(
         df_goals_conceded[['team_name', 'goals_conceded_last_3']],
         left_on='opponent_team',
@@ -568,22 +537,21 @@ def join_it_all_together():
         'team_xg_per_90_opp': 'opponent_xg_per_90',
         'team_xg_against_per_90_opp': 'opponent_xg_against_per_90',
         'position': 'opponent_league_position',
-        'goals_conceded_last_3': 'opponent_goals_conceded_last_3'  # NEW
+        'goals_conceded_last_3': 'opponent_goals_conceded_last_3'
     })
     
     df = df.loc[:, ~df.columns.duplicated()]
-    
-    # Updated return with all new columns
-    return df[['full_name', 'team_name', 'player_position', 'current_fpl_cost', 
+
+    return df[['full_name', 'team_name', 'player_position', 'current_fpl_cost',
                'playing_time_min_percentage', 'xg_per_90', 'xag_per_90',
-               'yellows_per_90', 'reds_per_90', 
-               'clearances_blocks_interceptions_per_90', 'tackles_per_90', 
-               'team_xg_per_90', 'team_xg_against_per_90', 
+               'yellows_per_90', 'reds_per_90',
+               'clearances_blocks_interceptions_per_90', 'tackles_per_90',
+               'team_xg_per_90', 'team_xg_against_per_90',
                'opponent_xg_per_90', 'opponent_xg_against_per_90', 'opponent_league_position',
                'gameweek', 'is_at_home', 'team_league_position',
-               'points_last_3', 'xg_last_3', 'minutes_last_3',  # NEW
-               'is_penalty_taker', 'opponent_goals_conceded_last_3', 'ownership_percent',  # NEW
-               'influence', 'creativity', 'threat', 'ict_index']]  # NEW: ICT Index
+               'points_last_3', 'xg_last_3', 'minutes_last_3',
+               'is_penalty_taker', 'opponent_goals_conceded_last_3', 'ownership_percent',
+               'influence', 'creativity', 'threat', 'ict_index']]
 
 
 def get_players_with_points(gameweek=curr_gameweek-1):
@@ -627,24 +595,18 @@ def get_players_with_points(gameweek=curr_gameweek-1):
     return players_df[['full_name', 'gw_points', 'gw_minutes']]
 
 
-print("The current gameweek is: ",curr_gameweek)
+if __name__ == "__main__":
+    print("The current gameweek is: ", curr_gameweek)
 
+    gameweeks_seen = get_gameweeks_seen("/home/tars/Projects/fpl-oracle/data")
 
-gameweeks_seen = get_gameweeks_seen("/home/tars/Projects/fpl-oracle/data")
+    if curr_gameweek in gameweeks_seen:
+        print("The gameweek has already been grabbed.")
+    else:
+        df = join_it_all_together()
+        df.to_csv(f'/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv', index=False)
 
-# If we SEE 26, that means 25 is occuring. Thus, we should get y_24, x_25...
-
-if curr_gameweek in gameweeks_seen:
-    print("The gameweek has already been grabbed.")
-else:
-    # get the before gameweek data..
-    
-    # X
-    df = join_it_all_together()
-    df.to_csv(f'/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv', index=False)
-    
-    # Y
-    df_ = get_players_with_points()
-    X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv")
-    filtered = df_[df_['full_name'].isin(X['full_name'])]
-    filtered.to_csv(f'/home/tars/Projects/fpl-oracle/data/y_{curr_gameweek-1}.csv', index=False)
+        df_ = get_players_with_points()
+        X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv")
+        filtered = df_[df_['full_name'].isin(X['full_name'])]
+        filtered.to_csv(f'/home/tars/Projects/fpl-oracle/data/y_{curr_gameweek-1}.csv', index=False)
