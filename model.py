@@ -265,6 +265,18 @@ def publish(gameweek=None):
     csv_df["actual_points"] = pred_df.get("actual_points", "")
     csv_df["gameweek"] = gameweek
 
+    # Merge cost from X data
+    X_path = os.path.join(DATA_DIR, f"X_{gameweek}.csv")
+    if os.path.exists(X_path):
+        X = pd.read_csv(X_path)
+        csv_df = csv_df.merge(
+            X[["full_name", "current_fpl_cost"]].drop_duplicates(subset="full_name"),
+            on="full_name", how="left"
+        )
+        csv_df["cost"] = (csv_df["current_fpl_cost"].fillna(0) / 10).round(1)
+    else:
+        csv_df["cost"] = ""
+
     if "y" in file_map.get(gameweek, {}):
         y_actual = pd.read_csv(os.path.join(DATA_DIR, file_map[gameweek]["y"]))
         csv_df = csv_df.merge(
@@ -283,6 +295,7 @@ def publish(gameweek=None):
             "actual_points",
             "gameweek",
             "gw_minutes",
+            "cost",
         ]
     ]
 

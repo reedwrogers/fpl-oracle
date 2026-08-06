@@ -10699,3 +10699,1347 @@ Traceback (most recent call last):
   File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/generic.py", line 1914, in _get_label_or_level_values
     raise KeyError(key)
 KeyError: 'full_name'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/model.py", line 358, in <module>
+    gw = int(sys.argv[1])
+         ^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '--'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/model.py", line 358, in <module>
+    gw = int(sys.argv[1])
+         ^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '--'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/model.py", line 358, in <module>
+    gw = int(sys.argv[1])
+         ^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '--'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/model.py", line 358, in <module>
+    gw = int(sys.argv[1])
+         ^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '--'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/model.py", line 358, in <module>
+    gw = int(sys.argv[1])
+         ^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '--'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/model.py", line 358, in <module>
+    gw = int(sys.argv[1])
+         ^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '--'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+The current gameweek is:  0
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 606, in <module>
+    df = join_it_all_together()
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 472, in join_it_all_together
+    df_understat = get_understat_player_stats()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/data_v3.py", line 263, in get_understat_player_stats
+    df_understat[col] = pd.to_numeric(df_understat[col], errors='coerce')
+                                      ~~~~~~~~~~~~^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tars/Projects/fpl-oracle/venv311/lib/python3.11/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'time'
+Traceback (most recent call last):
+  File "/home/tars/Projects/fpl-oracle/model.py", line 358, in <module>
+    gw = int(sys.argv[1])
+         ^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '--'
