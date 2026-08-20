@@ -8,6 +8,30 @@ from understatapi import UnderstatClient
 
 UNDERSTAT_SEASON = "2026"
 
+# Players no longer on any FPL team (left the league/club) and still listed in
+# the API. They are excluded from feature generation so they never enter
+# predictions, training pairs, or the recommended squad.
+EXCLUDED_PLAYERS = {"Enes Ünal"}
+
+# Rookies / fringe players who never really played contaminate predictions:
+# they are candidates for the recommended squad but have no evidence of playing.
+# A single garbage-time minute still counts as >0 in the API, so require at least
+# one full match of minutes to be considered a real option.
+MIN_TOTAL_MINUTES = 90
+
+# FPL bootstrap normalizes influence/creativity/threat/ict to per-90 minutes. A
+# player with a few garbage-time minutes gets absurd per-90 values (e.g. 1 minute
+# -> influence_per_90 of 180). We winsorize each per-90 column at the given
+# quantile (computed live over the populated data) so outliers can't dominate.
+PER_90_CAP_QUANTILE = 0.99
+
+PER_90_COLS = [
+    "influence_per_90",
+    "creativity_per_90",
+    "threat_per_90",
+    "ict_per_90",
+]
+
 TEAM_TEST_MAP = {
     "Manchester United": "Man Utd",
     "Manchester City": "Man City",
@@ -30,9 +54,9 @@ TEAM_TEST_MAP = {
 
 UNDERSTAT_TEAMS = [
     "Manchester City", "Arsenal", "Liverpool", "Aston Villa", "Tottenham",
-    "Chelsea", "Newcastle United", "Manchester United", "West Ham",
-    "Crystal Palace", "Brighton", "Bournemouth", "Fulham", "Wolverhampton Wanderers",
-    "Everton", "Brentford", "Nottingham Forest", "Ipswich", "Coventry", "Hull",
+    "Chelsea", "Newcastle United", "Manchester United", "Crystal Palace",
+    "Brighton", "Bournemouth", "Fulham", "Everton", "Brentford",
+    "Nottingham Forest", "Ipswich", "Coventry", "Hull", "Leeds", "Sunderland",
 ]
 
 def get_gameweeks_seen(data_dir="/data"):
@@ -65,7 +89,24 @@ def get_next_gameweek():
 
     return int(next_gw.iloc[0]) 
 
-curr_gameweek = get_next_gameweek()-1 # returns the actual current gameweek. If it is about to be 25, returns 25
+def get_latest_finished_gameweek():
+    """
+    Returns the id of the most recently finished gameweek (0 if none yet).
+    Actual points are only reliable once FPL marks the event as finished.
+    """
+    url = "https://fantasy.premierleague.com/api/bootstrap-static/"
+    data = requests.get(url).json()
+    events = pd.DataFrame(data["events"])
+
+    finished = events.loc[events["finished"] == True, "id"]
+    if finished.empty:
+        return 0
+
+    return int(finished.max())
+
+# The upcoming gameweek to predict. After GW N finishes we generate features
+# for GW N+1 (latest stats + GW N+1 fixtures) and actuals for GW N.
+curr_gameweek = get_next_gameweek()
 
 def get_fixtures(week_wanted):
     """
@@ -146,8 +187,9 @@ def get_fpl_defensive_stats():
 def get_fpl_recent_stats():
     """
     Gets recent form stats (last 3 games) and ICT index for all FPL players.
-    Returns: points_last_3, xg_last_3, minutes_last_3, is_penalty_taker, 
-             ownership_percent, influence, creativity, threat, ict_index
+    Returns: points_last_3, xg_last_3, minutes_last_3, is_penalty_taker,
+             ownership_percent, influence_per_90, creativity_per_90,
+             threat_per_90, ict_per_90
     """
     url = "https://fantasy.premierleague.com/api/bootstrap-static/"
     response = requests.get(url)
@@ -176,11 +218,14 @@ def get_fpl_recent_stats():
             xg_last_3 = round(sum(float(gw.get('expected_goals', 0)) for gw in last_3), 2)
             minutes_last_3 = sum(gw.get('minutes', 0) for gw in last_3)
             
-            # Get ICT index components (these are season totals from bootstrap)
-            influence = float(player_info.get('influence', 0))
-            creativity = float(player_info.get('creativity', 0))
-            threat = float(player_info.get('threat', 0))
-            ict_index = float(player_info.get('ict_index', 0))
+            # ICT index components (season totals from bootstrap), normalized
+            # per 90 minutes so they measure quality rather than total minutes.
+            minutes = float(player_info.get('minutes', 0))
+            per_90 = (90.0 / minutes) if minutes > 0 else float('nan')
+            influence = float(player_info.get('influence', 0)) * per_90
+            creativity = float(player_info.get('creativity', 0)) * per_90
+            threat = float(player_info.get('threat', 0)) * per_90
+            ict_index = float(player_info.get('ict_index', 0)) * per_90
             
             # Penalty taker status (from penalties_order in bootstrap)
             is_penalty_taker = 1 if player_info.get('penalties_order', 0) in [1, 2] else 0
@@ -193,12 +238,13 @@ def get_fpl_recent_stats():
                 'points_last_3': points_last_3,
                 'xg_last_3': xg_last_3,
                 'minutes_last_3': minutes_last_3,
+                'total_minutes': minutes,
                 'is_penalty_taker': is_penalty_taker,
                 'ownership_percent': ownership_percent,
-                'influence': influence,
-                'creativity': creativity,
-                'threat': threat,
-                'ict_index': ict_index
+                'influence_per_90': influence,
+                'creativity_per_90': creativity,
+                'threat_per_90': threat,
+                'ict_per_90': ict_index
             })
             
         except Exception as e:
@@ -257,6 +303,12 @@ def get_understat_player_stats(season=UNDERSTAT_SEASON, pt_threshold=60):
         data = understat.league(league="EPL").get_player_data(season=season)
     
     df_understat = pd.DataFrame(data)
+
+    if df_understat.empty:
+        return pd.DataFrame(columns=[
+            'player_name', 'playing_time_min_percentage', 'xg_per_90',
+            'xag_per_90', 'yellows_per_90', 'reds_per_90'
+        ])
     
     numeric_cols = ['time', 'games', 'xG', 'xA', 'yellow_cards', 'red_cards']
     for col in numeric_cols:
@@ -409,6 +461,19 @@ def get_fpl_players():
     
     return players_df
 
+def cap_per_90_outliers(df):
+    """Winsorize each per-90 ICT column at its live quantile to tame outliers
+    from players with very few minutes. Mutates and returns df."""
+    for col in PER_90_COLS:
+        if col in df.columns:
+            values = df[col].dropna()
+            if len(values) == 0:
+                continue
+            cap = values.quantile(PER_90_CAP_QUANTILE)
+            df[col] = df[col].clip(upper=cap)
+    return df
+
+
 def fuzzy_match(fpl_df, understat_df, threshold=92):
     """
     Fuzzy matches FPL players to Understat player stats by name
@@ -542,6 +607,11 @@ def join_it_all_together():
     
     df = df.loc[:, ~df.columns.duplicated()]
 
+    df = df[~df["full_name"].isin(EXCLUDED_PLAYERS)].copy()
+    if "total_minutes" in df.columns:
+        df = df[df["total_minutes"] >= MIN_TOTAL_MINUTES]
+    df = cap_per_90_outliers(df)
+
     return df[['full_name', 'team_name', 'player_position', 'current_fpl_cost',
                'playing_time_min_percentage', 'xg_per_90', 'xag_per_90',
                'yellows_per_90', 'reds_per_90',
@@ -549,9 +619,9 @@ def join_it_all_together():
                'team_xg_per_90', 'team_xg_against_per_90',
                'opponent_xg_per_90', 'opponent_xg_against_per_90', 'opponent_league_position',
                'gameweek', 'is_at_home', 'team_league_position',
-               'points_last_3', 'xg_last_3', 'minutes_last_3',
-               'is_penalty_taker', 'opponent_goals_conceded_last_3', 'ownership_percent',
-               'influence', 'creativity', 'threat', 'ict_index']]
+                'points_last_3', 'xg_last_3', 'minutes_last_3', 'total_minutes',
+                'is_penalty_taker', 'opponent_goals_conceded_last_3', 'ownership_percent',
+                'influence_per_90', 'creativity_per_90', 'threat_per_90', 'ict_per_90']]
 
 
 def get_players_with_points(gameweek=curr_gameweek-1):
@@ -596,17 +666,35 @@ def get_players_with_points(gameweek=curr_gameweek-1):
 
 
 if __name__ == "__main__":
-    print("The current gameweek is: ", curr_gameweek)
+    data_dir = "/home/tars/Projects/fpl-oracle/data"
 
-    gameweeks_seen = get_gameweeks_seen("/home/tars/Projects/fpl-oracle/data")
+    last_finished = get_latest_finished_gameweek()
+    print(f"Next gameweek to predict: {curr_gameweek}")
+    print(f"Last finished gameweek: {last_finished}")
 
-    if curr_gameweek in gameweeks_seen:
-        print("The gameweek has already been grabbed.")
-    else:
+    wrote_y = False
+
+    # 1) Record actual points for the most recently finished gameweek.
+    if last_finished >= 1:
+        y_path = Path(data_dir) / f"y_{last_finished}.csv"
+        if not y_path.exists():
+            df_points = get_players_with_points(gameweek=last_finished)
+            x_path = Path(data_dir) / f"X_{last_finished}.csv"
+            if x_path.exists():
+                X = pd.read_csv(x_path)
+                df_points = df_points[df_points["full_name"].isin(X["full_name"])]
+            df_points.to_csv(y_path, index=False)
+            print(f"Wrote {y_path}")
+            wrote_y = True
+        else:
+            print(f"{y_path.name} already exists.")
+
+    # 2) Generate/refresh features for the upcoming gameweek. Regenerate when a
+    #    gameweek just finished (new stats available) or the file is missing.
+    x_path = Path(data_dir) / f"X_{curr_gameweek}.csv"
+    if curr_gameweek >= 1 and (not x_path.exists() or wrote_y):
         df = join_it_all_together()
-        df.to_csv(f'/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv', index=False)
-
-        df_ = get_players_with_points()
-        X = pd.read_csv(f"/home/tars/Projects/fpl-oracle/data/X_{curr_gameweek}.csv")
-        filtered = df_[df_['full_name'].isin(X['full_name'])]
-        filtered.to_csv(f'/home/tars/Projects/fpl-oracle/data/y_{curr_gameweek-1}.csv', index=False)
+        df.to_csv(x_path, index=False)
+        print(f"Wrote {x_path}")
+    elif curr_gameweek >= 1:
+        print(f"{x_path.name} already up to date.")

@@ -4,7 +4,9 @@
 FPL 2026/27 player data is available (bootstrap-static).
 Understat 2026/27 has no data (season hasn't started).
 We use 2025/26 Understat end-of-season stats for returning players.
-FPL-derived features (points_last_3, etc.) are zeroed out since no games played.
+Per-gameweek FPL features (points_last_3, minutes_last_3, defensive stats) are
+zeroed out since no games played; season-level features (ICT index, penalty
+order, ownership) come from the live bootstrap.
 
 Usage:
   python preseason.py        # generate GWs 1, 2, 3
@@ -20,7 +22,14 @@ from understatapi import UnderstatClient
 import requests
 
 sys.path.insert(0, os.path.dirname(__file__))
-from data_v3 import TEAM_TEST_MAP, get_fixtures, get_opponent_goals_conceded
+from data_v3 import (
+    TEAM_TEST_MAP,
+    get_fixtures,
+    get_opponent_goals_conceded,
+    EXCLUDED_PLAYERS,
+    MIN_TOTAL_MINUTES,
+    cap_per_90_outliers,
+)
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
@@ -108,6 +117,14 @@ def load_shared_data():
     fpl["full_name"] = fpl["first_name"] + " " + fpl["second_name"]
     fpl["current_fpl_cost"] = fpl["now_cost"]
     fpl["selected_by_percent"] = fpl["selected_by_percent"].astype(float)
+    minutes = fpl["minutes"].astype(float)
+    fpl["total_minutes"] = minutes
+    per_90 = np.where(minutes > 0, 90.0 / minutes, np.nan)
+    fpl["influence_per_90"] = fpl["influence"].astype(float) * per_90
+    fpl["creativity_per_90"] = fpl["creativity"].astype(float) * per_90
+    fpl["threat_per_90"] = fpl["threat"].astype(float) * per_90
+    fpl["ict_per_90"] = fpl["ict_index"].astype(float) * per_90
+    fpl["is_penalty_taker"] = fpl["penalties_order"].isin([1.0, 2.0]).astype(int)
     print(f"  {len(fpl)} players")
 
     print("Fetching 2025/26 Understat player data...")
@@ -179,7 +196,9 @@ def build_preseason_x(gameweek, shared):
     goals_data = shared["goals"]
 
     df = fpl[["full_name", "team_name", "player_position", "current_fpl_cost",
-              "selected_by_percent"]].copy()
+              "selected_by_percent", "total_minutes", "influence_per_90",
+              "creativity_per_90", "threat_per_90", "ict_per_90",
+              "is_penalty_taker"]].copy()
 
     # Merge Understat
     df["_match"] = df["full_name"].map(shared["match_map"])
@@ -238,14 +257,18 @@ def build_preseason_x(gameweek, shared):
         if col in df.columns:
             df[col] = df[col].fillna(df[col].median())
 
-    # Zero out FPL-derived features (no games played yet)
-    for col in ["points_last_3", "xg_last_3", "minutes_last_3", "is_penalty_taker",
-                "influence", "creativity", "threat", "ict_index",
+    # Zero out features that require per-gameweek history (none exists pre-season)
+    for col in ["points_last_3", "xg_last_3", "minutes_last_3",
                 "clearances_blocks_interceptions_per_90", "tackles_per_90",
                 "team_league_position", "opponent_league_position"]:
         df[col] = 0
 
     df["ownership_percent"] = fpl["selected_by_percent"].astype(float)
+
+    df = df[~df["full_name"].isin(EXCLUDED_PLAYERS)].copy()
+    if "total_minutes" in df.columns:
+        df = df[df["total_minutes"] >= MIN_TOTAL_MINUTES]
+    df = cap_per_90_outliers(df)
 
     df = df.loc[:, ~df.columns.duplicated()]
 
@@ -257,9 +280,9 @@ def build_preseason_x(gameweek, shared):
         "team_xg_per_90", "team_xg_against_per_90",
         "opponent_xg_per_90", "opponent_xg_against_per_90", "opponent_league_position",
         "gameweek", "is_at_home", "team_league_position",
-        "points_last_3", "xg_last_3", "minutes_last_3",
+        "points_last_3", "xg_last_3", "minutes_last_3", "total_minutes",
         "is_penalty_taker", "opponent_goals_conceded_last_3", "ownership_percent",
-        "influence", "creativity", "threat", "ict_index",
+        "influence_per_90", "creativity_per_90", "threat_per_90", "ict_per_90",
     ]]
 
 

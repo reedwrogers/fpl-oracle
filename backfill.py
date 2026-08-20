@@ -24,9 +24,9 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 # Columns that come from FPL APIs (already correct in existing files, keep as-is)
 FPL_BASE_COLS = [
     "full_name", "team_name", "player_position", "current_fpl_cost",
-    "points_last_3", "xg_last_3", "minutes_last_3",
+    "points_last_3", "xg_last_3", "minutes_last_3", "total_minutes",
     "is_penalty_taker", "ownership_percent",
-    "influence", "creativity", "threat", "ict_index",
+    "influence_per_90", "creativity_per_90", "threat_per_90", "ict_per_90",
     "clearances_blocks_interceptions_per_90", "tackles_per_90",
     "gameweek", "is_at_home", "team_league_position", "opponent_league_position",
 ]
@@ -132,9 +132,9 @@ def rebuild_x(gameweek: int) -> pd.DataFrame:
         "team_xg_per_90", "team_xg_against_per_90",
         "opponent_xg_per_90", "opponent_xg_against_per_90", "opponent_league_position",
         "gameweek", "is_at_home", "team_league_position",
-        "points_last_3", "xg_last_3", "minutes_last_3",
+        "points_last_3", "xg_last_3", "minutes_last_3", "total_minutes",
         "is_penalty_taker", "opponent_goals_conceded_last_3", "ownership_percent",
-        "influence", "creativity", "threat", "ict_index",
+        "influence_per_90", "creativity_per_90", "threat_per_90", "ict_per_90",
     ]]
     return result
 
@@ -242,9 +242,9 @@ def rebuild_x_single(gameweek, df_understat, df_teams, df_goals_conceded):
         "team_xg_per_90", "team_xg_against_per_90",
         "opponent_xg_per_90", "opponent_xg_against_per_90", "opponent_league_position",
         "gameweek", "is_at_home", "team_league_position",
-        "points_last_3", "xg_last_3", "minutes_last_3",
+        "points_last_3", "xg_last_3", "minutes_last_3", "total_minutes",
         "is_penalty_taker", "opponent_goals_conceded_last_3", "ownership_percent",
-        "influence", "creativity", "threat", "ict_index",
+        "influence_per_90", "creativity_per_90", "threat_per_90", "ict_per_90",
     ]]
     return result
 
