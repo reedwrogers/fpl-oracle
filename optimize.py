@@ -18,8 +18,10 @@ import numpy as np
 import pandas as pd
 from pulp import LpProblem, LpMaximize, LpVariable, lpSum, PULP_CBC_CMD
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-PUBLISH_DIR = "/var/www/reedrogers/data"
+import config
+
+DATA_DIR = config.DATA_DIR
+PUBLISH_DIR = config.PUBLISH_DIR
 
 POSITIONS = ["Goalkeeper", "Defender", "Midfielder", "Forward"]
 SQUAD_COUNTS = {"Goalkeeper": 2, "Defender": 5, "Midfielder": 5, "Forward": 3}
