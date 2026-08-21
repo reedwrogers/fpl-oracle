@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPL Oracle</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32_.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16_.png" />
+
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: "Courier New", Courier, monospace;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1, h2 {
+      color: #FFFFFF;
+    }
+
+    a {
+      color: white;
+      text-decoration: underline;
+    }
+
+    a:hover {
+      color: #F28C28;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      border: 1px solid #F28C28;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #F28C28;
+      background: #111;
+    }
+
+    #predictions-container {
+      max-height: 500px;
+      overflow-x: auto;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border-bottom: 1px solid #F28C28;
+      padding: 6px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    th:hover {
+      color: #F28C28;
+    }
+
+    .filter-row th {
+      border-bottom: 1px solid #F28C28;
+      padding: 4px 6px;
+      cursor: default;
+    }
+
+    .filter-row th:hover { color: inherit; }
+
+    .column-filter {
+      width: 100%;
+      box-sizing: border-box;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #eee;
+      font-size: 0.8em;
+      padding: 5px 6px;
+    }
+
+    .column-filter:focus {
+      outline: none;
+      border-color: #F28C28;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .status-badge {
+      font-size: 0.85em;
+      color: #F28C28;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .metric-card {
+      border: 1px solid #F28C28;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .metric-card .label {
+      font-size: 0.75em;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .metric-card .value {
+      font-size: 1.6em;
+      font-weight: bold;
+      margin: 4px 0;
+    }
+
+    .metric-card .value.good { color: #4CAF50; }
+    .metric-card .value.ok   { color: #F28C28; }
+    .metric-card .value.bad  { color: #E53935; }
+
+    .backtest-table-wrapper {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+
+    .collapsible-header {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .collapsible-header:hover {
+      color: #F28C28;
+    }
+
+    .arrow {
+      transition: transform 0.2s ease;
+    }
+
+    .collapsible-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .collapsible:not(.open) .collapsible-content {
+      max-height: 0;
+    }
+
+    .collapsible.open .collapsible-content {
+      max-height: 4000px;
+    }
+
+    .collapsible:not(.open) .arrow {
+      transform: rotate(-90deg);
+    }
+
+    .post {
+      border-bottom: 1px dashed #F28C28;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .post:last-child {
+      border-bottom: none;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      color: #F28C28;
+      margin-bottom: 6px;
+    }
+
+    .post-date { font-size: 0.9em; }
+    .post-title { font-size: 1em; }
+    .post p { text-align: left; line-height: 1.5; }
+
+    #data-downloads { margin-top: 30px; }
+    #data-downloads ul { list-style: none; padding: 0; }
+    #data-downloads li { margin: 5px 0; }
+
+    .empty-state {
+      color: #666;
+      font-style: italic;
+      padding: 20px;
+    }
+
+    .section-divider {
+      height: 1px;
+      max-width: 1000px;
+      margin: 30px auto;
+      background: #F28C28;
+      opacity: 0.3;
+    }
+
+    .formation-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .formation-tab {
+      border: 1px solid #F28C28;
+      color: #aaa;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8em;
+      white-space: nowrap;
+    }
+
+    .formation-tab:hover { color: #F28C28; }
+
+    .formation-tab.active {
+      background: #F28C28;
+      color: #111;
+      font-weight: bold;
+    }
+
+    .squad-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    @media (max-width: 700px) {
+      .squad-grid { grid-template-columns: 1fr; }
+    }
+
+    .squad-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+    }
+
+    .squad-table td {
+      border-bottom: 1px solid #333;
+      padding: 3px 5px;
+      text-align: left;
+      font-size: 0.85em;
+    }
+
+    .squad-table .pts { color: #F28C28; font-weight: bold; }
+    .squad-table .cost { color: #888; }
+
+    .squad-meta {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 10px;
+      font-size: 0.85em;
+      color: #aaa;
+    }
+
+    .squad-meta b { color: #F28C28; }
+
+    .pitch {
+      background: #1a3a1a;
+      border: 2px solid #F28C28;
+      border-radius: 8px;
+      padding: 20px 15px 15px 15px;
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .pitch-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin: 8px 0;
+      position: relative;
+    }
+
+    .pitch-label {
+      position: absolute;
+      left: -5px;
+      color: #888;
+      font-size: 0.6em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transform: rotate(-90deg);
+      transform-origin: left center;
+    }
+
+    .pitch-card {
+      background: #111;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 5px 8px;
+      text-align: center;
+      font-size: 0.75em;
+      min-width: 90px;
+      max-width: 130px;
+      flex: 1;
+      margin: 0 3px;
+    }
+
+    .pitch-card.starter {
+      border-color: #F28C28;
+    }
+
+    .pitch-card.bench {
+      opacity: 0.5;
+    }
+
+    .pitch-card.captain {
+      border-color: #F28C28;
+      box-shadow: 0 0 8px #F28C28;
+    }
+
+    .pitch-card .pname {
+      color: #fff;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pitch-card .pteam {
+      color: #888;
+      font-size: 0.8em;
+    }
+
+    .pitch-card .ppts {
+      color: #F28C28;
+      font-weight: bold;
+    }
+
+    .pitch-card .pcost {
+      color: #666;
+      font-size: 0.8em;
+    }
+
+    .pitch-bench {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .pitch-bench .pitch-card {
+      flex: 0 0 auto;
+      min-width: 80px;
+      max-width: 100px;
+    }
+
+    .pitch-divider {
+      border-top: 1px dashed #F28C28;
+      opacity: 0.3;
+      margin: 10px 0;
+    }
+
+    .auth-btn {
+      background: transparent;
+      color: #F28C28;
+      border: 1px solid #F28C28;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.8em;
+    }
+
+    .auth-btn:hover { background: #F28C28; color: #111; }
+
+    .edit-controls {
+      background: #1a1a1a;
+      border: 1px solid #F28C28;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .edit-controls select, .edit-controls input {
+      background: #111;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 3px 6px;
+      font-family: inherit;
+      font-size: 0.8em;
+      border-radius: 3px;
+    }
+
+    .edit-controls select { cursor: pointer; }
+
+    .edit-player-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid #222;
+      font-size: 0.8em;
+      flex-wrap: wrap;
+    }
+
+    .edit-player-row input { width: 130px; }
+    .edit-player-row input.narrow { width: 50px; }
+    .edit-player-row .remove-btn {
+      color: #E53935;
+      cursor: pointer;
+      font-weight: bold;
+      border: none;
+      background: none;
+      font-size: 1em;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: #111;
+      border: 2px solid #F28C28;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 0 20px #F28C28;
+    }
+
+    .modal-box h3 { margin-top: 0; color: #F28C28; }
+
+    .modal-box label {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.8em;
+      color: #aaa;
+    }
+
+    .modal-box input, .modal-box select {
+      width: 100%;
+      background: #222;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.85em;
+      margin-top: 2px;
+      box-sizing: border-box;
+    }
+
+    .modal-box input:focus, .modal-box select:focus {
+      border-color: #F28C28;
+      outline: none;
+    }
+
+    .modal-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .modal-actions button {
+      background: transparent;
+      color: #F28C28;
+      border: 1px solid #F28C28;
+      padding: 5px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .modal-actions button:hover { background: #F28C28; color: #111; }
+    .modal-actions button.danger { color: #E53935; border-color: #E53935; }
+    .modal-actions button.danger:hover { background: #E53935; color: #fff; }
+
+    .squad-toggle-btn {
+      display: block;
+      margin: 3px auto 0;
+      padding: 1px 5px;
+      font-size: 0.6em;
+      color: #888;
+      background: transparent;
+      border: 1px solid #555;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .squad-toggle-btn:hover { color: #F28C28; border-color: #F28C28; }
+
+    .filter-pills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 2px 8px;
+      border: 1px solid #555;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.7em;
+      color: #888;
+    }
+
+    .filter-pill:hover { border-color: #F28C28; color: #F28C28; }
+    .filter-pill.active { background: #F28C28; color: #111; border-color: #F28C28; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #F28C28;
+      color: #111;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      z-index: 2000;
+      transition: opacity 0.3s;
+    }
+
+    .toast.toast-error { background: #E53935; color: #fff; }
+  </style>
+</head>
+
+<body>
+
+  <h1>FPL Oracle: Using data to predict fantasy points</h1>
+
+  <!-- Predictions table -->
+  <div id="predictions-container" class="container">
+    <div id="status-bar" class="status-bar"></div>
+    <table id="predictions-table">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Optimized Squad -->
+  <div id="squad-container" class="container" style="text-align:left;">
+    <h2>Optimized Squad</h2>
+    <div id="squad-content" class="empty-state">Loading squad...</div>
+  </div>
+
+  <!-- My Squad (coming soon — pulls the official FPL team once auth is integrated) -->
+  <div id="mysquad-container" class="container" style="text-align:left;">
+    <h2>My Squad</h2>
+    <div id="mysquad-content" class="empty-state">Coming soon — my official submitted FPL team will appear here once I integrate FPL API authentication.</div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- Metrics dashboard -->
+  <div id="metrics-container" class="container" style="text-align:left;">
+    <h2>Model Performance</h2>
+    <div id="metrics-content" class="empty-state">Loading metrics...</div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- Blog (collapsible) -->
+  <div id="devlog" class="container collapsible">
+    <h2 class="collapsible-header">
+      <span class="arrow">&#x25B8;</span> Model Blog
+    </h2>
+    <div class="collapsible-content">
+      <div class="post">
+        <div class="post-header">
+          <span class="post-date">2026-03-09</span>
+          <span class="post-title">Improving the model with more features</span>
+        </div>
+        <p>
+We need to add some more features in order to get better model performance. Our best predictor as of now has a -0.2 correlation with the target, and that is the xG for the team the player is going against.
+If we want to have a usable model, we need more predictive power from our attributes. As of now, all types of models
+are converging around an R-squared of 0, and in most cases they are even worse. A negative R-squared implies that the model does worse than a model that simply would predict the average of the attribute.<br><br>
+The priority now is to add the following: points_last_3 (average form), xG_last_3, minutes_last_3, is_penalty_taker, ownership_percent, and the three FPL ICT index statistics.
+        </p>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-date">2026-02-03</span>
+          <span class="post-title">Pipeline up again</span>
+        </div>
+        <p>
+The pipeline is back up and running again. I double checked all teams are being properly pulled, and all the data we want is also being pulled.<br><br>
+I will let this run for a couple of weeks and then observe the results. Once we have a few weeks worth of data, I can start doing predictions again, and uploading them.<br><br>
+Once this occurs, I will have a couple priorities: 1) to compute metrics and display them using the predictions.csv file which is displayed on this page. 2) to think about computing some sort of recency metrics to feed into the model. Some measure of "form" - as this is important!
+        </p>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-date">2026-01-29</span>
+          <span class="post-title">Pipeline almost fixed</span>
+        </div>
+        <p>
+The pipeline is almost fixed, replacing the Fbref data using Understat. I think the new methods in the script are actually cleaner, so this could be a blessing in disguise.<br><br>
+Just need to pull blocks and interceptions per 90 from somewhere. If I can get those as totals, I can get them per 90 using the Understat data. I noticed I was not even using tackles per 90 in the previous sets of data.
+        </p>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-date">2026-01-21</span>
+          <span class="post-title">Opta Betrayal</span>
+        </div>
+        <p>
+Funnily enough, after saying the pipeline was set, on January 20th, 2026 - Fbref removed all advanced statistics from their website. I am calling this the "Opta Betrayal".<br><br>
+For now, I am going to halt the cron job that runs the data collection script temporarily. I am already working at replacing the lost data from Fbref using data from Understat.
+        </p>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-date">2026-01-19</span>
+          <span class="post-title">What's next?</span>
+        </div>
+        <p>
+The pipeline to get data is pretty set in my opinion. I can take my time working through the model details, as the pipeline will
+continue to get data each week that will eventually be valuable.<br><br>
+1) I need to deal with the vast amount of 0 scores I am observing in the data. 0's indicate in most cases that a player is not playing at all. I should either raise
+the total minutes requirement for training and testing data (only train on, and predict on, players who pretty much play every game), or I need to somehow play with
+the model to punish it for predicting lower values (maybe use a different metric, like RMSE?)<br><br>
+2) I want to play around with, and understand my model parameters. Should I test other models, as well?<br><br>
+3) I want to get a better understanding of the metrics for the model. What is the best way to measure performance? What does the confusion matrix look like? Can we display this
+as it is derived from the predictions.csv table above? Does R-squared matter in this application?
+        </p>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-date">2026-01-12</span>
+          <span class="post-title">Initial model building</span>
+        </div>
+        <p>
+I wrote a snippet of code that trains the model using all available data, except for the most recent week.
+Therefore, each week's predictions will use more and more data. I started with a pretty basic gradient boosted decision tree
+from scikit-learn. I kept the given parameters. An MAE of about 2.5 looks pretty decent, but I worry this might not be a true representation.
+I observe a ton of instances where players are getting 0 points - if my model just predicts small values, all these scores of 0 make the
+MAE look much lower than it really is. I should do something about these 0's, as we really only want instances where a player is playing
+60 to 90 minutes and still scoring a 0.
+        </p>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <span class="post-date">2026-01-01</span>
+          <span class="post-title">Data collection error</span>
+        </div>
+        <p>
+I wanted to start messing around with building models after collecting data
+for a few weeks, but I noticed that data was not pulling for some players because
+of the way a team name was being formatted. This was fixed!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- About the Model (collapsible) -->
+  <div id="model-explanation" class="container collapsible" style="margin-top: 15px;">
+    <h2 class="collapsible-header">
+      <span class="arrow">&#x25B8;</span> About the Model
+    </h2>
+    <div class="collapsible-content">
+      <p>
+        This project scrapes <b>Understat</b> and the <b>Premier League Fantasy</b> site to build a comprehensive dataset
+        for predicting player points. The model evolves as more data becomes available, and I continually optimize
+        it for prediction.
+      </p>
+      <p>
+        A player's <b>Fantasy Premier League points</b> in a given week are modeled as a function of:
+      </p>
+      <ul>
+        <li><b>Player history:</b> past FPL performance and position</li>
+        <li><b>Player effectiveness:</b> expected and per-90 statistics</li>
+        <li><b>Team strength:</b> chances created and conceded per 90</li>
+        <li><b>Opponent strength:</b> league position and expected stats</li>
+        <li><b>Match context:</b> gameweek and home/away status</li>
+      </ul>
+      <p>
+        A script runs at about 5:00 AM (GMT), before any games that day have began. If the gameweek is new, then last week's predictions are appended to last week's data, and this week's data is grabbed.
+      </p>
+    </div>
+  </div>
+
+  <div id="data-downloads">
+    <h2>Download Data</h2>
+    <ul>
+      <li><a href="/data/predictions.csv" download>predictions.csv</a></li>
+      <li><a href="/data/metrics.json" download>metrics.json</a></li>
+      <li><a href="/data/squad.json" download>squad.json</a></li>
+    </ul>
+  </div>
+
+  <script>
+    // --- Collapsible sections ---
+    document.querySelectorAll('.collapsible-header').forEach(header => {
+      header.addEventListener('click', () => {
+        header.closest('.collapsible').classList.toggle('open');
+      });
+    });
+
+    // --- Predictions table ---
+    let currentHeaders = [];
+    let currentRows = [];
+    let sortColumn = null;
+    let sortAscending = true;
+    let columnFilters = {}; // column index -> filter string
+
+    function loadCSV() {
+      fetch('/data/predictions.csv?_=' + Date.now())
+        .then(res => {
+          if (!res.ok) throw new Error('No predictions yet');
+          return res.text();
+        })
+        .then(text => {
+          const lines = text.trim().split('\n');
+          if (lines.length < 2) return;
+          currentHeaders = lines[0].split(',');
+          currentRows = lines.slice(1).map(l => l.split(','));
+          renderTable();
+          updateStatusBar();
+        })
+        .catch(() => {
+          document.querySelector('#predictions-table tbody').innerHTML =
+            '<tr><td colspan="7" class="empty-state">No predictions available yet. Check back during the season!</td></tr>';
+        });
+    }
+
+    function renderTable() {
+      const thead = document.querySelector('#predictions-table thead');
+      const tbody = document.querySelector('#predictions-table tbody');
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+
+      const headerRow = document.createElement('tr');
+      currentHeaders.forEach((h, i) => {
+        const th = document.createElement('th');
+        th.textContent = h;
+        th.onclick = () => sortByColumn(i);
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      // Filter row (one input per column)
+      const filterRow = document.createElement('tr');
+      filterRow.className = 'filter-row';
+      currentHeaders.forEach((h, i) => {
+        const th = document.createElement('th');
+        th.className = 'filter-cell';
+        th.onclick = (e) => e.stopPropagation();
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'column-filter';
+        input.placeholder = 'Filter ' + h + '...';
+        input.value = columnFilters[i] || '';
+        input.dataset.col = i;
+        input.addEventListener('input', () => {
+          columnFilters[i] = input.value;
+          applyFilters();
+        });
+        th.appendChild(input);
+        filterRow.appendChild(th);
+      });
+      thead.appendChild(filterRow);
+
+      const visible = currentRows.filter(row => matchesFilters(row));
+      visible.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      if (visible.length === 0) {
+        tbody.innerHTML =
+          '<tr><td colspan="' + currentHeaders.length + '" class="empty-state">No players match your filters.</td></tr>';
+      }
+    }
+
+    function matchesFilters(row) {
+      for (const i in columnFilters) {
+        const f = (columnFilters[i] || '').trim();
+        if (!f) continue;
+        const cell = row[i] == null ? '' : String(row[i]);
+        // Numeric comparison support: e.g. ">4", ">=3.5", "<2", "=5"
+        const m = f.match(/^(<=|>=|<>|!=|=|<|>)\s*([-+]?[0-9]*\.?[0-9]+)$/);
+        const num = parseFloat(cell);
+        if (m && !isNaN(num)) {
+          const op = m[1];
+          const target = parseFloat(m[2]);
+          switch (op) {
+            case '<': if (!(num < target)) return false; break;
+            case '>': if (!(num > target)) return false; break;
+            case '<=': if (!(num <= target)) return false; break;
+            case '>=': if (!(num >= target)) return false; break;
+            case '=': if (num !== target) return false; break;
+            case '!=': case '<>': if (num === target) return false; break;
+          }
+          continue;
+        }
+        if (!cell.toLowerCase().includes(f.toLowerCase())) return false;
+      }
+      return true;
+    }
+
+    function applyFilters() {
+      renderTable();
+    }
+
+    function sortByColumn(index) {
+      sortAscending = sortColumn === index ? !sortAscending : true;
+      sortColumn = index;
+      currentRows.sort((a, b) => {
+        const x = parseFloat(a[index]);
+        const y = parseFloat(b[index]);
+        if (!isNaN(x) && !isNaN(y)) {
+          return sortAscending ? x - y : y - x;
+        }
+        return sortAscending
+          ? a[index].localeCompare(b[index])
+          : b[index].localeCompare(a[index]);
+      });
+      renderTable();
+    }
+
+    function updateStatusBar() {
+      const bar = document.getElementById('status-bar');
+      const gwRow = currentRows[0];
+      if (gwRow && gwRow.length >= 6) {
+        const gw = gwRow[5];
+        const hasActuals = currentRows.some(r => r[4] && r[4].trim() !== '');
+        bar.innerHTML =
+          '<span class="status-badge">Gameweek ' + gw + '</span>' +
+          '<span class="status-badge">' + (hasActuals ? 'Actuals available' : 'Pre-match predictions') + '</span>' +
+          '<span class="status-badge">' + currentRows.length + ' players</span>';
+      }
+    }
+
+    // --- Metrics dashboard ---
+    function loadMetrics() {
+      fetch('/data/metrics.json?_=' + Date.now())
+        .then(res => {
+          if (!res.ok) throw new Error('No metrics yet');
+          return res.json();
+        })
+        .then(data => {
+          renderMetrics(data);
+        })
+        .catch(() => {
+          document.getElementById('metrics-content').innerHTML =
+            '<div class="empty-state">No metrics available yet. They will appear once the model has been run against completed gameweeks.</div>';
+        });
+    }
+
+    function renderMetrics(data) {
+      const container = document.getElementById('metrics-content');
+      container.innerHTML = '';
+
+      const eval = data.latest_eval;
+      const backtest = data.backtest || [];
+
+      // Status row
+      let statusHtml = '<div class="status-bar">';
+      statusHtml += '<span class="status-badge">Latest GW: ' + data.current_gameweek + '</span>';
+      statusHtml += '<span class="status-badge">Training GWs: ' + data.total_training_gws + '</span>';
+      if (data.last_updated) {
+        const d = new Date(data.last_updated);
+        statusHtml += '<span class="status-badge">Updated: ' + d.toLocaleDateString() + '</span>';
+      }
+      statusHtml += '</div>';
+      container.innerHTML += statusHtml;
+
+      // Latest evaluation cards
+      if (eval && Object.keys(eval).length > 0) {
+        container.innerHTML += '<h3 style="margin-top:0;">Latest Evaluation (GW ' + eval.gameweek + ')</h3>';
+        container.innerHTML += '<div class="metrics-grid">' +
+          metricCard('MAE', eval.mae, eval.mae < 2.3 ? 'good' : eval.mae < 3.0 ? 'ok' : 'bad') +
+          metricCard('R\u00B2', eval.r2, eval.r2 > 0.1 ? 'good' : eval.r2 > -0.1 ? 'ok' : 'bad') +
+          metricCard('Spearman \u03C1', eval.spearman, eval.spearman > 0.2 ? 'good' : eval.spearman > 0.0 ? 'ok' : 'bad') +
+          metricCard('Top-20 Precision', '<b>' + eval.top20_precision + '</b>', '') +
+          metricCard('Players', eval.n_players, '') +
+          metricCard('RMSE', eval.rmse, '') +
+          '</div>';
+      }
+
+      // Backtest history table
+      if (backtest.length > 0) {
+        container.innerHTML += '<h3>Historical Performance</h3>';
+        container.innerHTML +=
+          '<div class="backtest-table-wrapper"><table id="backtest-table"><thead><tr>' +
+          '<th>GW</th><th>Players</th><th>MAE</th><th>R\u00B2</th><th>Spearman \u03C1</th><th>Top-20</th>' +
+          '</tr></thead><tbody></tbody></table></div>';
+
+        const btBody = document.querySelector('#backtest-table tbody');
+        backtest.reverse().forEach(row => {
+          const cls = row.r2 > 0.1 ? 'good' : row.r2 > -0.1 ? 'ok' : 'bad';
+          btBody.innerHTML += '<tr>' +
+            '<td><b>' + row.gameweek + '</b></td>' +
+            '<td>' + row.n_players + '</td>' +
+            '<td>' + row.mae + '</td>' +
+            '<td class="' + cls + '">' + row.r2 + '</td>' +
+            '<td>' + row.spearman + '</td>' +
+            '<td><b>' + row.top20_precision + '</b></td>' +
+            '</tr>';
+        });
+      }
+    }
+
+    function metricCard(label, value, colorClass) {
+      return '<div class="metric-card"><div class="label">' + label +
+        '</div><div class="value' + (colorClass ? ' ' + colorClass : '') + '">' + value + '</div></div>';
+    }
+
+    loadCSV();
+    loadMetrics();
+    loadSquad();
+
+    // --- Squad optimizer ---
+    function loadSquad() {
+      fetch('/data/squad.json?_=' + Date.now())
+        .then(res => {
+          if (!res.ok) throw new Error('No squad data');
+          return res.json();
+        })
+        .then(data => renderSquad(data))
+        .catch(() => {
+          document.getElementById('squad-content').innerHTML =
+            '<div class="empty-state">No squad data available yet. Run <code>python optimize.py</code> to generate.</div>';
+        });
+    }
+
+    function renderSquad(data) {
+      const container = document.getElementById('squad-content');
+      container.innerHTML = '';
+
+      const weeks = data.weeks;
+      if (!weeks || weeks.length === 0) {
+        container.innerHTML = '<div class="empty-state">No squad computed.</div>';
+        return;
+      }
+
+      // name -> cost lookup from the 15-man squad
+      const costMap = {};
+      let squadCost = 0;
+      (data.squad || []).forEach(p => { costMap[p.name] = p.cost; squadCost += p.cost; });
+
+      // Meta
+      container.innerHTML +=
+        '<div class="squad-meta">' +
+        '<span>Gameweek <b>' + data.gameweek + '</b></span>' +
+        '<span>Average <b>' + data.avg_expected_points_per_week + '</b> pts/week</span>' +
+        '<span>Total <b>' + data.total_expected_points + '</b> pts over ' + data.num_weeks + ' GWs</span>' +
+        '<span>Cost <b>£' + squadCost.toFixed(1) + 'm</b></span>' +
+        '</div>';
+
+      // Squad summary (15 players, 5-GW average)
+      if (data.squad && data.squad.length) {
+        let squadHtml =
+          '<div class="squad-meta"><span style="font-weight:bold;color:#F28C28;">15-man squad (5-GW average)</span></div>' +
+          '<table class="squad-table">' +
+          '<tr><td colspan="5" style="color:#888;font-size:0.78em;">Player / Team / Position / Cost / Avg</td></tr>';
+        [...data.squad].sort((a, b) => b.avg_points - a.avg_points).forEach(p => {
+          squadHtml += '<tr><td>' + p.name + '</td><td style="color:#999;">' + p.team +
+            '</td><td>' + p.position + '</td><td class="cost">£' + p.cost + 'm</td>' +
+            '<td class="pts">' + p.avg_points + '</td></tr>';
+        });
+        squadHtml += '</table>';
+        container.innerHTML += squadHtml;
+      }
+
+      // Week tabs
+      let tabs = '<div class="formation-tabs">';
+      weeks.forEach((w, i) => {
+        tabs += '<span class="formation-tab' + (i === 0 ? ' active' : '') +
+          '" data-idx="' + i + '" onclick="switchWeek(' + i + ')">' +
+          'GW' + w.gameweek + ' · ' + w.formation + ' (' + w.expected_points + 'pts)' +
+          '</span>';
+      });
+      tabs += '</div>';
+      container.innerHTML += tabs;
+
+      const wrapper = document.createElement('div');
+      wrapper.id = 'squad-tables';
+      container.appendChild(wrapper);
+
+      renderWeek(weeks[0], costMap);
+
+      // Store data for switching
+      container._data = weeks;
+      container._costMap = costMap;
+    }
+
+    function switchWeek(idx) {
+      document.querySelectorAll('.formation-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.formation-tab[data-idx="' + idx + '"]').forEach(t => t.classList.add('active'));
+      const container = document.getElementById('squad-content');
+      if (container._data) renderWeek(container._data[idx], container._costMap);
+    }
+
+    function renderWeek(w, costMap) {
+      const wrapper = document.getElementById('squad-tables');
+      wrapper.innerHTML = '';
+
+      wrapper.innerHTML += '<div class="squad-meta">' +
+        '<span>Formation: <b>' + w.formation + '</b></span>' +
+        '<span>Expected: <b>' + w.expected_points + '</b> pts</span>' +
+        (w.captain ? '<span>Captain: <b style="color:#F28C28;">' + w.captain + '</b></span>' : '') +
+        '</div>';
+
+      const grid = document.createElement('div');
+      grid.className = 'squad-grid';
+
+      function posTable(title, players) {
+        const order = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
+        const grouped = {};
+        order.forEach(pos => { grouped[pos] = []; });
+        players.forEach(p => {
+          const pos = p.position || 'Unknown';
+          if (grouped[pos]) grouped[pos].push(p);
+          else (grouped['Unknown'] = grouped['Unknown'] || []).push(p);
+        });
+
+        let html = '<div><strong>' + title + '</strong><table class="squad-table">';
+        order.forEach(pos => {
+          const list = grouped[pos];
+          if (!list || list.length === 0) return;
+          html += '<tr><td colspan="3" style="color:#F28C28;font-size:0.75em;padding-top:4px;">' + pos + 's</td></tr>';
+          list.sort((a, b) => b.points - a.points).forEach(p => {
+            let name = p.name;
+            if (p.role === 'captain') name += ' <b style=\"color:#F28C28\">(C)</b>';
+            const cost = (costMap && costMap[p.name] != null) ? '£' + costMap[p.name] + 'm' : '';
+            html += '<tr><td>' + name + '</td><td class="cost">' + cost + '</td><td class="pts">' + p.points + '</td></tr>';
+          });
+        });
+        html += '</table></div>';
+        return html;
+      }
+
+      grid.innerHTML = posTable('Starting XI', w.starters) + posTable('Bench', w.bench);
+      wrapper.appendChild(grid);
+    }
+    function showToast(msg, isError) {
+      const toast = document.createElement('div');
+      toast.className = 'toast' + (isError ? ' toast-error' : '');
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 1500);
+    }
+  </script>
+</body>
+</html>

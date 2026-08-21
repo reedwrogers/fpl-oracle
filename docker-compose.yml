@@ -1,0 +1,9 @@
+services:
+  fpl:
+    image: nginx:alpine
+    container_name: fpl
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - ./site:/usr/share/nginx/html:ro

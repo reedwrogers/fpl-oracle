@@ -6,7 +6,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
 DATA_DIR = Path(os.environ.get("FPL_ORACLE_DATA_DIR", BASE_DIR / "data"))
-PUBLISH_DIR = Path(os.environ.get("FPL_ORACLE_PUBLISH_DIR", "/var/www/reedrogers/data"))
+# Where the web assets (predictions.csv, metrics.json, squad.json) are written.
+# Served by the project's own nginx container at fpl.reedrogers.xyz.
+PUBLISH_DIR = Path(os.environ.get("FPL_ORACLE_PUBLISH_DIR", BASE_DIR / "site" / "data"))
 
 FPL_API = "https://fantasy.premierleague.com/api"
 
