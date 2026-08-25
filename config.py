@@ -12,6 +12,9 @@ PUBLISH_DIR = Path(os.environ.get("FPL_ORACLE_PUBLISH_DIR", BASE_DIR / "site" / 
 
 FPL_API = "https://fantasy.premierleague.com/api"
 
+# FPL team/entry ID surfaced in the "My Squad" section of the site.
+MY_TEAM_ID = 2162827
+
 # Understat labels a season by its start year.
 SEASON = "2026"        # current / upcoming season
 PRIOR_SEASON = "2025"  # last completed season (used pre-season / backfill)
@@ -127,9 +130,10 @@ UNDERSTAT_TEAMS_PRIOR = [
 # training pairs, or the recommended squad.
 EXCLUDED_PLAYERS = {"Enes Ünal"}
 
-# Rookies/fringe players need at least one full match of minutes to be a real
-# option (a single garbage-time minute still counts as >0 in the API).
-MIN_TOTAL_MINUTES = 90
+# Rookies/fringe players need meaningful minutes to be a real option (a single
+# garbage-time minute still counts as >0 in the API). 45 min (~half a match)
+# keeps rotation/bench players while excluding one-off cameos.
+MIN_TOTAL_MINUTES = 45
 
 # Minimum % of minutes played to keep a player's Understat stats (drops players
 # with too little playing time to trust their per-90 rates).
@@ -138,7 +142,7 @@ PLAYING_TIME_MIN_PCT = 60
 # Fuzzy-match score threshold for mapping FPL -> Understat player names.
 FUZZY_MATCH_THRESHOLD = 92
 
-# FPL bootstrap normalizes ICT to per-90; a player with a few garbage-time
+# FPL normalizes ICT to per-90; a player with a few garbage-time
 # minutes gets absurd per-90 values, so we winsorize at this quantile.
 PER_90_CAP_QUANTILE = 0.99
 

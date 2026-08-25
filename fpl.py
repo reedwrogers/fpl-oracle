@@ -34,11 +34,34 @@ def get_next_gameweek() -> int:
 
 
 def get_latest_finished_gameweek() -> int:
+    """Most recent completed gameweek.
+
+    The event-level ``finished`` flag can lag behind the actual results (it
+    sometimes doesn't flip until the next gameweek begins), so we fall back to
+    fixture data: a gameweek is complete once all of its fixtures have kicked
+    off and recorded a score."""
     events = pd.DataFrame(bootstrap()["events"])
     finished = events.loc[events["finished"] == True, "id"]
-    if finished.empty:
+    if not finished.empty:
+        return int(finished.max())
+
+    fixtures = pd.DataFrame(_get_json(f"{config.FPL_API}/fixtures/"))
+    if fixtures.empty:
         return 0
-    return int(finished.max())
+
+    done = (
+        (fixtures["started"] == True)
+        & fixtures["team_h_score"].notna()
+        & fixtures["team_a_score"].notna()
+    )
+    fixtures = fixtures.assign(done=done)
+
+    completed = [
+        int(gw)
+        for gw, grp in fixtures.groupby("event")
+        if len(grp) > 0 and grp["done"].all()
+    ]
+    return max(completed) if completed else 0
 
 
 # --- Data sources -----------------------------------------------------------
@@ -75,11 +98,92 @@ def get_fixtures(week: int) -> pd.DataFrame:
     return fixtures[["home_team", "away_team", "week"]]
 
 
+def _played_fixtures() -> pd.DataFrame:
+    """Fixtures that have actually been played (started + a recorded score).
+
+    The ``finished`` flag lags behind real results, so derive "played" from the
+    presence of a scoreline."""
+    fixtures = pd.DataFrame(_get_json(f"{config.FPL_API}/fixtures/"))
+    if fixtures.empty:
+        return fixtures
+    played = (
+        (fixtures["started"] == True)
+        & fixtures["team_h_score"].notna()
+        & fixtures["team_a_score"].notna()
+    )
+    return fixtures[played]
+
+
 def get_standings() -> pd.DataFrame:
+    """Current league table computed from played fixtures.
+
+    The bootstrap ``teams[].position`` field is not populated reliably (it's 0
+    here), so we rank teams ourselves: points, then goal difference, then goals
+    scored."""
+    teams = pd.DataFrame(bootstrap()["teams"])[["id", "name"]]
+    fixtures = _played_fixtures()
+
+    rows = []
+    for _, t in teams.iterrows():
+        tid = t["id"]
+        home = fixtures[fixtures["team_h"] == tid]
+        away = fixtures[fixtures["team_a"] == tid]
+
+        gf = int(home["team_h_score"].sum() + away["team_a_score"].sum())
+        ga = int(home["team_a_score"].sum() + away["team_h_score"].sum())
+        wins = int(
+            (home["team_h_score"] > home["team_a_score"]).sum()
+            + (away["team_a_score"] > away["team_h_score"]).sum()
+        )
+        draws = int(
+            (home["team_h_score"] == home["team_a_score"]).sum()
+            + (away["team_a_score"] == away["team_h_score"]).sum()
+        )
+
+        rows.append({
+            "name": t["name"],
+            "points": wins * 3 + draws,
+            "goal_difference": gf - ga,
+            "goals_for": gf,
+        })
+
+    standings = pd.DataFrame(rows).sort_values(
+        ["points", "goal_difference", "goals_for"], ascending=False
+    ).reset_index(drop=True)
+    standings["position"] = standings.index + 1
+    standings["team_name"] = standings["name"].replace(config.TEAM_MAP)
+    return standings[["team_name", "position"]]
+
+
+def get_upcoming_fixtures(gameweek: int, num_weeks: int) -> dict:
+    """Upcoming fixtures keyed by raw FPL team name.
+
+    Returns ``{team_name: [{gameweek, opponent, is_home}]}`` for the next
+    ``num_weeks`` gameweeks, where ``opponent`` is the raw FPL team name."""
     data = bootstrap()
-    teams = pd.DataFrame(data["teams"])[["name", "position"]]
-    teams["team_name"] = teams["name"].replace(config.TEAM_MAP)
-    return teams[["team_name", "position"]]
+    team_names = {t["id"]: t["name"] for t in data["teams"]}
+    fixtures = pd.DataFrame(_get_json(f"{config.FPL_API}/fixtures/"))
+    fixtures = fixtures[
+        (fixtures["event"] >= gameweek) & (fixtures["event"] < gameweek + num_weeks)
+    ]
+
+    out: dict[str, list[dict]] = {}
+    for _, fx in fixtures.iterrows():
+        h = team_names[fx["team_h"]]
+        a = team_names[fx["team_a"]]
+        gw = int(fx["event"])
+        out.setdefault(h, []).append({"gameweek": gw, "opponent": a, "is_home": True})
+        out.setdefault(a, []).append({"gameweek": gw, "opponent": h, "is_home": False})
+    return out
+
+
+def mapped_to_raw_team_map() -> dict:
+    """Map each Understat/mapped team name back to the raw FPL team name."""
+    data = bootstrap()
+    return {
+        config.TEAM_MAP.get(t["name"], t["name"]): t["name"]
+        for t in data["teams"]
+    }
 
 
 def get_fixtures_and_league_spots(gameweek: int) -> pd.DataFrame:
@@ -174,10 +278,9 @@ def get_recent_stats() -> pd.DataFrame:
 
 
 def get_opponent_goals_conceded() -> pd.DataFrame:
-    """Goals conceded in the last 3 finished games for each team."""
+    """Goals conceded in the last 3 played games for each team."""
     teams = pd.DataFrame(bootstrap()["teams"])
-    fixtures = pd.DataFrame(_get_json(f"{config.FPL_API}/fixtures/"))
-    fixtures = fixtures[fixtures["finished"] == True]
+    fixtures = _played_fixtures()
 
     rows = []
     for team_id in teams["id"]:
@@ -212,3 +315,81 @@ def get_players_with_points(gameweek: int) -> pd.DataFrame:
     players["gw_points"] = points
     players["gw_minutes"] = minutes
     return players[["full_name", "gw_points", "gw_minutes"]]
+
+
+def get_my_team(team_id: int, gameweek: int | None = None) -> dict:
+    """A manager's submitted squad for a gameweek, resolved to names/teams/
+    positions/cost with live points where available. No auth required — the
+    entry and picks endpoints are public."""
+    data = bootstrap()
+    players = pd.DataFrame(data["elements"])
+    teams = {t["id"]: t["name"] for t in data["teams"]}
+    positions = {p["id"]: p["singular_name"] for p in data["element_types"]}
+
+    entry = _get_json(f"{config.FPL_API}/entry/{team_id}/")
+    if gameweek is None:
+        gameweek = int(entry.get("current_event") or get_next_gameweek())
+
+    picks = _get_json(f"{config.FPL_API}/entry/{team_id}/event/{gameweek}/picks/")
+    history = picks.get("entry_history", {})
+
+    live_points: dict[int, int] = {}
+    try:
+        live = _get_json(f"{config.FPL_API}/event/{gameweek}/live/")
+        for el in live.get("elements", []):
+            live_points[int(el["id"])] = el["stats"].get("total_points", 0)
+    except Exception:
+        pass
+
+    info = players.set_index("id")
+
+    def player_row(pid: int) -> dict:
+        p = info.loc[int(pid)]
+        return {
+            "id": int(pid),
+            "name": f"{p['first_name']} {p['second_name']}",
+            "team": teams.get(int(p["team"])),
+            "position": positions.get(int(p["element_type"])),
+            "cost": float(p["now_cost"]) / 10.0,
+            "points": int(live_points.get(int(pid), 0)),
+        }
+
+    starters, bench = [], []
+    captain = vice_captain = None
+    for pk in picks.get("picks", []):
+        row = player_row(pk["element"])
+        row["is_captain"] = bool(pk["is_captain"])
+        row["is_vice_captain"] = bool(pk["is_vice_captain"])
+        (starters if pk["multiplier"] > 0 else bench).append(row)
+        if row["is_captain"]:
+            captain = row["name"]
+        if row["is_vice_captain"]:
+            vice_captain = row["name"]
+
+    position_order = {"Goalkeeper": 0, "Defender": 1, "Midfielder": 2, "Forward": 3}
+    starters.sort(key=lambda r: (position_order.get(r["position"], 9), -r["points"]))
+    bench.sort(key=lambda r: (position_order.get(r["position"], 9), -r["points"]))
+
+    def_count = sum(1 for r in starters if r["position"] == "Defender")
+    mid_count = sum(1 for r in starters if r["position"] == "Midfielder")
+    fwd_count = sum(1 for r in starters if r["position"] == "Forward")
+
+    return {
+        "team_id": team_id,
+        "team_name": entry.get("name"),
+        "manager": f"{entry.get('player_first_name', '')} {entry.get('player_last_name', '')}".strip(),
+        "gameweek": gameweek,
+        "points": history.get("points", 0),
+        "total_points": history.get("total_points", 0),
+        "overall_rank": history.get("overall_rank", entry.get("summary_overall_rank")),
+        "team_value": (history.get("value") or entry.get("last_deadline_value", 0)) / 10.0,
+        "bank": (history.get("bank") or entry.get("last_deadline_bank", 0)) / 10.0,
+        "transfers": history.get("event_transfers", 0),
+        "transfers_cost": history.get("event_transfers_cost", 0),
+        "points_on_bench": history.get("points_on_bench", 0),
+        "captain": captain,
+        "vice_captain": vice_captain,
+        "formation": f"{def_count}-{mid_count}-{fwd_count}",
+        "starters": starters,
+        "bench": bench,
+    }

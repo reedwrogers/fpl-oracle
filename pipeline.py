@@ -14,6 +14,7 @@ Usage:
   python pipeline.py backfill
 """
 
+import json
 import sys
 
 import pandas as pd
@@ -50,6 +51,20 @@ def publish(gameweek: int | None = None) -> None:
     model.publish(gameweek)
 
 
+def write_my_team() -> None:
+    """Fetch the manager's FPL squad and write it for the site (idempotent)."""
+    config.PUBLISH_DIR.mkdir(parents=True, exist_ok=True)
+    out = config.PUBLISH_DIR / "myteam.json"
+    try:
+        team = fpl.get_my_team(config.MY_TEAM_ID)
+    except Exception as e:
+        print(f"Skipping my-team fetch: {e}")
+        return
+    with open(out, "w") as f:
+        json.dump(team, f, indent=2)
+    print(f"Wrote {out} ({team['team_name']}, GW {team['gameweek']})")
+
+
 def run() -> None:
     last_finished = fpl.get_latest_finished_gameweek()
     next_gw = fpl.get_next_gameweek()
@@ -73,7 +88,10 @@ def run() -> None:
             write_x(next_gw)
             changed = True
 
-    # 3) Publish only when something actually changed.
+    # 3) Refresh the manager's own squad for the site (cheap, always run).
+    write_my_team()
+
+    # 4) Publish only when something actually changed.
     if changed:
         publish(next_gw)
     else:
@@ -181,4 +199,5 @@ if __name__ == "__main__":
         "preseason": preseason,
         "backfill": backfill,
         "publish": lambda: publish(),
+        "myteam": write_my_team,
     }[command]()

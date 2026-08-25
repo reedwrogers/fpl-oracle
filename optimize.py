@@ -67,8 +67,13 @@ def load_long(gameweek, num_weeks):
     return df
 
 
-def optimize_squad(df, budget=1000, time_limit=120):
+def optimize_squad(df, budget=1000, time_limit=120, current_names=None, num_transfers=None, forbid_squads=None):
     """Solve the combined squad + per-week starting-XI problem.
+
+    If ``current_names`` and ``num_transfers`` are given, the squad is anchored
+    to the current team: exactly ``num_transfers`` of those players are dropped
+    (replaced by new signings). ``forbid_squads`` is a list of exact 15-player
+    squads (sets of names) to exclude, used to enumerate alternatives.
 
     Returns (squad, weeks) where:
       - squad is a list of 15 player dicts
@@ -88,6 +93,11 @@ def optimize_squad(df, budget=1000, time_limit=120):
         (r.full_name, r.gameweek): r.predicted_points for r in df.itertuples()
     }
 
+    # A player may be missing from some gameweeks (e.g. in-season vs pre-season
+    # feature sets); fall back to their average across the weeks they appear in.
+    def pts_at(name: str, week: int) -> float:
+        return pts.get((name, week), avg_pts[name])
+
     prob = LpProblem("Squad", LpMaximize)
 
     # x[i] = 1 if player i is in the 15-man squad
@@ -98,8 +108,8 @@ def optimize_squad(df, budget=1000, time_limit=120):
 
     # Objective: sum over weeks of (starters points + captain bonus)
     prob += (
-        lpSum(pts[(names[i], w)] * y[(i, w)] for i in range(n) for w in weeks)
-        + lpSum(pts[(names[i], w)] * c[(i, w)] for i in range(n) for w in weeks)
+        lpSum(pts_at(names[i], w) * y[(i, w)] for i in range(n) for w in weeks)
+        + lpSum(pts_at(names[i], w) * c[(i, w)] for i in range(n) for w in weeks)
     )
 
     # Squad constraints (15 players, per-position counts, max 3 per team, budget)
@@ -109,6 +119,18 @@ def optimize_squad(df, budget=1000, time_limit=120):
     for t in set(team.values()):
         prob += lpSum(x[i] for i in range(n) if team[names[i]] == t) <= 3
     prob += lpSum(x[i] * cost[names[i]] for i in range(n)) <= budget
+
+    # Transfer count: drop exactly num_transfers of the current squad.
+    if current_names and num_transfers is not None:
+        current_idx = [i for i in range(n) if names[i] in current_names]
+        prob += lpSum(x[i] for i in current_idx) == len(current_idx) - num_transfers
+
+    # Exclude previously-found squads (for enumerating K-best alternatives).
+    if forbid_squads:
+        for fs in forbid_squads:
+            idx_fs = [i for i in range(n) if names[i] in fs]
+            if len(idx_fs) == 15:
+                prob += lpSum(x[i] for i in idx_fs) <= 14
 
     # Per-week constraints: best XI with a valid formation + one captain,
     # all drawn from the squad.
@@ -150,9 +172,9 @@ def optimize_squad(df, budget=1000, time_limit=120):
         m = sum(1 for nm in starters if pos[nm] == "Midfielder")
         f = sum(1 for nm in starters if pos[nm] == "Forward")
 
-        expected = float(sum(pts[(nm, w)] for nm in starters))
+        expected = float(sum(pts_at(nm, w) for nm in starters))
         if captain is not None:
-            expected += float(pts[(captain, w)])
+            expected += float(pts_at(captain, w))
 
         bench = [nm for nm in squad_names if nm not in starters]
 
@@ -165,14 +187,14 @@ def optimize_squad(df, budget=1000, time_limit=120):
                 {
                     "name": nm,
                     "position": pos[nm],
-                    "points": float(round(pts[(nm, w)], 1)),
+                    "points": float(round(pts_at(nm, w), 1)),
                     "role": "captain" if nm == captain else "",
                 }
-                for nm in sorted(starters, key=lambda nm: -pts[(nm, w)])
+                for nm in sorted(starters, key=lambda nm: -pts_at(nm, w))
             ],
             "bench": [
-                {"name": nm, "position": pos[nm], "points": float(round(pts[(nm, w)], 1))}
-                for nm in sorted(bench, key=lambda nm: -pts[(nm, w)])
+                {"name": nm, "position": pos[nm], "points": float(round(pts_at(nm, w), 1))}
+                for nm in sorted(bench, key=lambda nm: -pts_at(nm, w))
             ],
         })
         total += expected
@@ -226,6 +248,145 @@ def publish_squad(gameweek=None, num_weeks=1):
         print("  Bench:")
         for b in wk["bench"]:
             print(f"  {b['name']:<35s} {b['position']:<11s} {b['points']} pts")
+
+
+def _player_dict(df, name, team_lookup=None):
+    sub = df[df["full_name"] == name]
+    if len(sub) > 0:
+        row = sub.iloc[0]
+        return {
+            "name": name,
+            "team": row["team_name"],
+            "position": row["position"],
+            "cost": float(round(row["current_fpl_cost"] / 10, 1)),
+            "avg_points": float(round(sub["predicted_points"].mean(), 2)),
+        }
+    p = (team_lookup or {}).get(name, {})
+    return {
+        "name": name,
+        "team": p.get("team"),
+        "position": p.get("position"),
+        "cost": p.get("cost"),
+        "avg_points": None,
+    }
+
+
+def publish_transfers(gameweek=None, num_weeks=5, max_transfers=5, num_options=3):
+    """Recommend transfers that maximize expected points over ``num_weeks``,
+    anchored to the manager's current squad.
+
+    For each transfer count 1..max_transfers, enumerates up to ``num_options``
+    distinct alternatives (K-best via forbidden-solution iteration), each with
+    the transfer-in players' upcoming fixtures. Writes transfers.json."""
+    if gameweek is None:
+        gameweek = 1
+
+    from fpl import get_my_team, get_upcoming_fixtures, mapped_to_raw_team_map
+
+    df = load_long(gameweek, num_weeks)
+    weeks = sorted(df["gameweek"].unique())
+    if not weeks:
+        print("No gameweeks to optimize.")
+        return
+
+    team = get_my_team(config.MY_TEAM_ID)
+    current_names = [p["name"] for p in team["starters"] + team["bench"]]
+    current_set = set(current_names)
+    team_lookup = {p["name"]: p for p in team["starters"] + team["bench"]}
+
+    # Ensure every current player is in the pool: add missing ones (bench fodder
+    # with no model prediction) with 0 predicted points, so they're correctly
+    # counted as "held" rather than phantom transfers.
+    extra_rows = []
+    for n in current_names:
+        if n in df["full_name"].values:
+            continue
+        p = team_lookup.get(n, {})
+        if not p.get("position"):
+            continue
+        team_name = config.TEAM_MAP.get(p.get("team"), p.get("team"))
+        cost = float(p.get("cost") or 0.0) * 10
+        for w in weeks:
+            extra_rows.append({
+                "full_name": n,
+                "position": p.get("position"),
+                "team_name": team_name,
+                "current_fpl_cost": cost,
+                "gameweek": w,
+                "predicted_points": 0.0,
+            })
+    if extra_rows:
+        df = pd.concat([df, pd.DataFrame(extra_rows)], ignore_index=True)
+
+    # Budget = current team value + money in the bank (in 0.1m units).
+    budget = int((team.get("team_value", 100.0) + team.get("bank", 0.0)) * 10)
+
+    fixtures_map = get_upcoming_fixtures(gameweek, num_weeks)
+    raw_map = mapped_to_raw_team_map()
+
+    def attach_fixtures(pd_player):
+        raw = raw_map.get(pd_player.get("team"), pd_player.get("team"))
+        pd_player["fixtures"] = fixtures_map.get(raw, [])
+        return pd_player
+
+    # Baseline: keep the current squad (0 transfers).
+    _, _, base_total = optimize_squad(
+        df, budget=budget, current_names=current_set, num_transfers=0
+    )
+    baseline = round(base_total, 1)
+
+    options = {}
+    for t in range(1, max_transfers + 1):
+        opts = []
+        forbidden = []
+        for _ in range(num_options):
+            squad, _, total = optimize_squad(
+                df, budget=budget, current_names=current_set,
+                num_transfers=t, forbid_squads=forbidden,
+            )
+            squad_names = {p["name"] for p in squad}
+            out = [n for n in current_names if n not in squad_names]
+            ins = [n for n in squad_names if n not in current_set]
+            if not ins:
+                break
+            opts.append({
+                "expected_points": round(total, 1),
+                "gain": round(total - baseline, 1),
+                "out": [_player_dict(df, n, team_lookup) for n in out],
+                "in": [attach_fixtures(_player_dict(df, n, team_lookup)) for n in ins],
+            })
+            forbidden.append(squad_names)
+        options[str(t)] = opts
+
+    current_squad = [_player_dict(df, n, team_lookup) for n in current_names]
+
+    output = {
+        "gameweek": gameweek,
+        "num_weeks": num_weeks,
+        "team_name": team.get("team_name"),
+        "manager": team.get("manager"),
+        "bank": team.get("bank"),
+        "team_value": team.get("team_value"),
+        "current_squad": current_squad,
+        "baseline_points": baseline,
+        "options": options,
+    }
+
+    path = os.path.join(PUBLISH_DIR, "transfers.json")
+    with open(path, "w") as f:
+        json.dump(output, f, indent=2)
+    print(f"  Published {path}")
+
+    print(f"\nTransfer recommendations (over {len(weeks)} GWs, budget £{budget / 10:.1f}m, baseline {baseline} pts):")
+    for t, opts in options.items():
+        if not opts:
+            continue
+        best = opts[0]
+        outs = ", ".join(p["name"] for p in best["out"])
+        ins = ", ".join(p["name"] for p in best["in"])
+        print(f"  {t} transfer(s), {len(opts)} option(s): OUT {outs} -> IN {ins}  ({best['expected_points']} pts, +{best['gain']})")
+
+    return output
 
 
 if __name__ == "__main__":

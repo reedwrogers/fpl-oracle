@@ -38,9 +38,9 @@ def predict(gameweek: int, verbose: bool = True):
         if "X" in pair and "y" in pair
     }
 
-    # Prefer prior gameweeks only; fall back to all available if none exist
-    prior_gws = [gw for gw in all_pairs if gw < gameweek]
-    train_gws = prior_gws if prior_gws else sorted(all_pairs.keys())
+    # Train on every completed gameweek except the target (avoids leakage and
+    # carries prior-season data forward across the season reset).
+    train_gws = sorted(gw for gw in all_pairs if gw != gameweek)
     if not train_gws:
         raise ValueError("No training data found.")
 
@@ -50,9 +50,11 @@ def predict(gameweek: int, verbose: bool = True):
         X = pd.read_csv(os.path.join(DATA_DIR, pair["X"]))
         y = pd.read_csv(os.path.join(DATA_DIR, pair["y"]))
         merged = X.merge(y, on="full_name", how="inner")
-        merged = merged[merged["minutes_last_3"] >= 180]
-        merged["gameweek"] = gw
-        merged_dfs.append(merged)
+        filtered = merged[merged["minutes_last_3"] >= 180].copy()
+        if filtered.empty:
+            continue
+        filtered["gameweek"] = gw
+        merged_dfs.append(filtered)
 
     if not merged_dfs:
         raise ValueError("No training data found.")
@@ -128,6 +130,15 @@ def predict(gameweek: int, verbose: bool = True):
     return pred_df.sort_values("predicted_points", ascending=False), metrics
 
 
+def _round(v, nd=3):
+    """Round a float to nd places; NaN/inf -> None for JSON safety."""
+    try:
+        v = float(v)
+        return round(v, nd) if np.isfinite(v) else None
+    except (TypeError, ValueError):
+        return None
+
+
 def _evaluate(pred_df, gameweek, verbose=True):
     scored = pred_df.dropna(subset=["actual_points"])
 
@@ -145,6 +156,24 @@ def _evaluate(pred_df, gameweek, verbose=True):
     top_actual = set(scored.nlargest(20, "actual_points")["full_name"])
     overlap = len(top_predicted & top_actual)
 
+    def pos_summary(sub):
+        if len(sub) == 0:
+            return None
+        rho_s, _ = spearmanr(sub["actual_points"], sub["predicted_points"])
+        return {
+            "n": int(len(sub)),
+            "mae": _round(mean_absolute_error(sub["actual_points"], sub["predicted_points"]), 2),
+            "rmse": _round(np.sqrt(mean_squared_error(sub["actual_points"], sub["predicted_points"])), 2),
+            "spearman": _round(rho_s, 3),
+        }
+
+    by_position = {}
+    if "position" in scored.columns:
+        for pos in ["Goalkeeper", "Defender", "Midfielder", "Forward"]:
+            s = pos_summary(scored[scored["position"] == pos])
+            if s is not None:
+                by_position[pos] = s
+
     if verbose:
         baseline_mae = np.mean(
             np.abs(scored["actual_points"] - scored["actual_points"].mean())
@@ -154,6 +183,10 @@ def _evaluate(pred_df, gameweek, verbose=True):
         print(f"  RMSE       : {rmse:.2f}")
         print(f"  R\N{SUPERSCRIPT TWO}         : {r2:.3f}")
         print(f"  Spearman   : {rho:.3f}  (p={p_value:.3f})")
+        for pos, s in by_position.items():
+            print(
+                f"    {pos:<12s} n={s['n']:>3}  MAE {s['mae']}  RMSE {s['rmse']}  Spearman {s['spearman']}"
+            )
         print("  ---")
         t0 = tier_mae(scored[scored["actual_points"] == 0], "0 pts")
         if t0 is not None:
@@ -180,11 +213,12 @@ def _evaluate(pred_df, gameweek, verbose=True):
     return {
         "gameweek": gameweek,
         "n_players": len(scored),
-        "mae": round(mae, 2),
-        "rmse": round(rmse, 2),
-        "r2": round(r2, 3),
-        "spearman": round(rho, 3),
+        "mae": _round(mae, 2),
+        "rmse": _round(rmse, 2),
+        "r2": _round(r2, 3),
+        "spearman": _round(rho, 3),
         "top20_precision": f"{overlap}/20",
+        "by_position": by_position,
     }
 
 
@@ -218,6 +252,15 @@ def find_latest_gameweek():
     return max(gws)
 
 
+def _chronological_gws(gws) -> list[int]:
+    """Order gameweeks across the season reset: prior-season gameweeks (the
+    tail we retain, gw >= 20) first, then the current season (gw < 20)."""
+    gws = sorted(set(int(g) for g in gws))
+    prior = [g for g in gws if g >= 20]
+    current = [g for g in gws if g < 20]
+    return prior + current
+
+
 def compute_metrics_json(gameweek=None):
     if gameweek is None:
         gameweek = find_latest_gameweek()
@@ -232,7 +275,7 @@ def compute_metrics_json(gameweek=None):
             kind, num = match.groups()
             file_map.setdefault(int(num), {})[kind] = f
 
-    test_gws = sorted(
+    test_gws = _chronological_gws(
         n
         for n in file_map
         if "X" in file_map[n] and "y" in file_map[n]
@@ -258,6 +301,40 @@ def compute_metrics_json(gameweek=None):
     }
 
 
+def write_correlation_json() -> None:
+    """Correlation matrix of every numeric feature across the full dataset,
+    written for the site's heatmap."""
+    pattern = re.compile(r"^X_(\d+)\.csv$")
+    frames = []
+    for f in sorted(os.listdir(DATA_DIR)):
+        if not pattern.match(f):
+            continue
+        try:
+            frames.append(pd.read_csv(os.path.join(DATA_DIR, f)))
+        except Exception:
+            continue
+    if not frames:
+        return
+
+    df = pd.concat(frames, ignore_index=True)
+    exclude = {"full_name", "team_name", "player_position", "gameweek"}
+    numeric = [
+        c for c in df.columns
+        if c not in exclude and pd.api.types.is_numeric_dtype(df[c]) and df[c].std() > 0
+    ]
+
+    corr = df[numeric].corr()
+    payload = {
+        "columns": list(corr.columns),
+        "matrix": corr.round(3).where(pd.notna(corr), None).values.tolist(),
+    }
+    os.makedirs(PUBLISH_DIR, exist_ok=True)
+    path = os.path.join(PUBLISH_DIR, "correlation.json")
+    with open(path, "w") as f:
+        json.dump(payload, f)
+    print(f"  Wrote {path}")
+
+
 def publish(gameweek=None):
     if gameweek is None:
         gameweek = find_latest_gameweek()
@@ -266,51 +343,24 @@ def publish(gameweek=None):
 
     pred_df, _ = predict(gameweek, verbose=True)
 
-    files = os.listdir(DATA_DIR)
-    pattern = re.compile(r"^(X|y)_(\d+)\.csv$")
-    file_map: dict[int, dict[str, str]] = {}
-    for f in files:
-        match = pattern.match(f)
-        if match:
-            kind, num = match.groups()
-            file_map.setdefault(int(num), {})[kind] = f
-
-    csv_df = pred_df[["full_name", "team_name", "position", "predicted_points"]].copy()
-    csv_df["actual_points"] = pred_df.get("actual_points", "")
-    csv_df["gameweek"] = gameweek
-
-    # Merge cost from X data
+    # Merge predicted points onto the full feature matrix so the published table
+    # carries every statistic the model used (no actuals/gw_minutes — those
+    # aren't known ahead of a gameweek).
     X_path = os.path.join(DATA_DIR, f"X_{gameweek}.csv")
-    if os.path.exists(X_path):
-        X = pd.read_csv(X_path)
-        csv_df = csv_df.merge(
-            X[["full_name", "current_fpl_cost"]].drop_duplicates(subset="full_name"),
-            on="full_name", how="left"
-        )
-        csv_df["cost"] = (csv_df["current_fpl_cost"].fillna(0) / 10).round(1)
-    else:
-        csv_df["cost"] = ""
+    X = pd.read_csv(X_path)
 
-    if "y" in file_map.get(gameweek, {}):
-        y_actual = pd.read_csv(os.path.join(DATA_DIR, file_map[gameweek]["y"]))
-        csv_df = csv_df.merge(
-            y_actual[["full_name", "gw_minutes"]], on="full_name", how="left"
-        )
-        csv_df["gw_minutes"] = csv_df["gw_minutes"].fillna(0).astype(int)
-    else:
-        csv_df["gw_minutes"] = ""
+    csv_df = pred_df[["full_name", "predicted_points"]].merge(
+        X, on="full_name", how="inner"
+    )
+    csv_df = csv_df.rename(columns={"player_position": "position"})
+    csv_df["cost"] = (csv_df["current_fpl_cost"].fillna(0) / 10).round(1)
 
+    feature_cols = [
+        c for c in config.FEATURE_COLUMNS
+        if c not in ("full_name", "team_name", "player_position", "current_fpl_cost")
+    ]
     csv_df = csv_df[
-        [
-            "full_name",
-            "team_name",
-            "position",
-            "predicted_points",
-            "actual_points",
-            "gameweek",
-            "gw_minutes",
-            "cost",
-        ]
+        ["full_name", "team_name", "position", "predicted_points", "cost"] + feature_cols
     ]
 
     os.makedirs(PUBLISH_DIR, exist_ok=True)
@@ -331,13 +381,15 @@ def publish(gameweek=None):
         json.dump(metrics, f, indent=2)
     print(f"  Wrote {metrics_path}")
 
-    # Run optimizer (default: optimize across next 3 GWs for fixture-proof squad)
-    print("  Running team optimizer...")
+    write_correlation_json()
+
+    # Run the transfer recommender (anchored to the manager's current squad).
+    print("  Running transfer recommender...")
     try:
-        from optimize import publish_squad
-        publish_squad(gameweek=gameweek, num_weeks=5)
+        from optimize import publish_transfers
+        publish_transfers(gameweek=gameweek, num_weeks=5)
     except Exception as e:
-        print(f"  Optimizer skipped: {e}")
+        print(f"  Transfer recommender skipped: {e}")
 
     return csv_df
 

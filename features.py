@@ -22,6 +22,40 @@ def cap_per_90_outliers(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+_ICT_COLS = ["influence_per_90", "creativity_per_90", "threat_per_90", "ict_per_90"]
+
+
+def _last_season_ict_lookup() -> dict:
+    """Per-player ICT from the most recent prior-season X file (keyed by
+    full_name). Used to bridge the gap until the current season's ICT is
+    populated by the FPL API."""
+    files = sorted(
+        (p for p in config.DATA_DIR.glob("X_*.csv")),
+        key=lambda p: int(p.stem.split("_")[1]),
+    )
+    if not files:
+        return {}
+    df = pd.read_csv(files[-1])
+    cols = [c for c in _ICT_COLS if c in df.columns]
+    if "full_name" not in df.columns or not cols:
+        return {}
+    return df.set_index("full_name")[cols].to_dict("index")
+
+
+def _fill_ict_from_prior(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace zero (not-yet-populated) current-season ICT with the most recent
+    prior-season values. Non-zero (real) current values are left untouched."""
+    lookup = _last_season_ict_lookup()
+    if not lookup:
+        return df
+    for col in _ICT_COLS:
+        if col not in df.columns:
+            continue
+        prior = df["full_name"].map(lambda n: lookup.get(n, {}).get(col, np.nan))
+        df[col] = df[col].where(df[col] != 0, prior)
+    return df
+
+
 def _match_map(fpl_names, understat_names) -> dict:
     """Fuzzy-match each FPL name to its closest Understat name (or None)."""
     mapping = {}
@@ -121,6 +155,7 @@ def build_features(gameweek: int, season: str = config.SEASON) -> pd.DataFrame:
     df = df[~df["full_name"].isin(config.EXCLUDED_PLAYERS)].copy()
     if "total_minutes" in df.columns:
         df = df[df["total_minutes"] >= config.MIN_TOTAL_MINUTES]
+    df = _fill_ict_from_prior(df)
     df = cap_per_90_outliers(df)
 
     return df[config.FEATURE_COLUMNS]
@@ -254,6 +289,7 @@ def build_preseason_features(gameweek: int, shared: dict | None = None) -> pd.Da
     df = df[~df["full_name"].isin(config.EXCLUDED_PLAYERS)].copy()
     if "total_minutes" in df.columns:
         df = df[df["total_minutes"] >= config.MIN_TOTAL_MINUTES]
+    df = _fill_ict_from_prior(df)
     df = cap_per_90_outliers(df)
 
     df = df.loc[:, ~df.columns.duplicated()]
