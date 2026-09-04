@@ -82,6 +82,7 @@ NAME_MAP = {
     "Marc Cucurella": "Marc Cucurella Saseta",
     "Mateus Fernandes": "Mateus Gonçalo Espanha Fernandes",
     "Matheus Cunha": "Matheus Santos Carneiro da Cunha",
+    "Mathis Cherki": "Rayan Cherki",
     "Matthew Cash": "Matty Cash",
     "Max Kilman": "Maximilian Kilman",
     "Moisés Caicedo": "Moisés Caicedo Corozo",

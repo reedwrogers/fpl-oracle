@@ -20,6 +20,16 @@ PUBLISH_DIR = config.PUBLISH_DIR
 UNDERSTAT_SEASON = config.SEASON
 
 
+def _minutes_threshold(gameweek: int) -> int:
+    """Minimum recent minutes for a player to be considered 'established'.
+
+    Scales with the number of games played: 60% of the available minutes in the
+    rolling last-3-game window. That's ~1 game at GW2, ~2 games at GW3, and 3
+    games (162 min) from GW4 onward."""
+    window = min(max(gameweek - 1, 1), 3)
+    return round(0.6 * window * 90)
+
+
 def predict(gameweek: int, verbose: bool = True):
     files = os.listdir(DATA_DIR)
     pattern = re.compile(r"^(X|y)_(\d+)\.csv$")
@@ -50,7 +60,7 @@ def predict(gameweek: int, verbose: bool = True):
         X = pd.read_csv(os.path.join(DATA_DIR, pair["X"]))
         y = pd.read_csv(os.path.join(DATA_DIR, pair["y"]))
         merged = X.merge(y, on="full_name", how="inner")
-        filtered = merged[merged["minutes_last_3"] >= 180].copy()
+        filtered = merged[merged["minutes_last_3"] >= _minutes_threshold(gw)].copy()
         if filtered.empty:
             continue
         filtered["gameweek"] = gw
@@ -101,7 +111,7 @@ def predict(gameweek: int, verbose: bool = True):
         raise ValueError(f"X_{gameweek}.csv not found")
 
     X_latest = pd.read_csv(os.path.join(DATA_DIR, file_map[gameweek]["X"]))
-    X_latest_filtered = X_latest[X_latest["minutes_last_3"] >= 180]
+    X_latest_filtered = X_latest[X_latest["minutes_last_3"] >= _minutes_threshold(gameweek)]
     if len(X_latest_filtered) == 0:
         X_latest_filtered = X_latest
 

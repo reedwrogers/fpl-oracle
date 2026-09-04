@@ -35,9 +35,14 @@ FORMATION_BOUNDS = {
 
 def load_long(gameweek, num_weeks):
     """Return a long DataFrame: one row per (player, gameweek) with predicted
-    points plus static player info."""
+    points plus static player info.
+
+    The pool is restricted to players who appear in the *current* gameweek's
+    predictions, so the optimizer only considers the same "established" players
+    shown in the predictions table."""
     from model import predict as model_predict
 
+    universe = None
     rows = []
     for gw in range(gameweek, gameweek + num_weeks):
         x_path = os.path.join(DATA_DIR, f"X_{gw}.csv")
@@ -46,6 +51,8 @@ def load_long(gameweek, num_weeks):
             continue
         X = pd.read_csv(x_path)
         pred_df, _ = model_predict(gw, verbose=False)
+        if universe is None:
+            universe = set(pred_df["full_name"])
         merged = pred_df.merge(
             X[["full_name", "current_fpl_cost"]], on="full_name", how="left"
         )
@@ -61,6 +68,8 @@ def load_long(gameweek, num_weeks):
         print(f"  GW {gw}: {len(merged)} players predicted")
 
     df = pd.concat(rows, ignore_index=True)
+    if universe:
+        df = df[df["full_name"].isin(universe)]
     df = df.dropna(
         subset=["predicted_points", "current_fpl_cost", "position", "team_name"]
     )
@@ -360,6 +369,9 @@ def publish_transfers(gameweek=None, num_weeks=5, max_transfers=5, num_options=3
 
     current_squad = [_player_dict(df, n, team_lookup) for n in current_names]
 
+    # Wildcard squad: best 15-man team from scratch with a £100m budget.
+    wildcard_squad, wildcard_weeks, wildcard_total = optimize_squad(df, budget=1000)
+
     output = {
         "gameweek": gameweek,
         "num_weeks": num_weeks,
@@ -370,6 +382,13 @@ def publish_transfers(gameweek=None, num_weeks=5, max_transfers=5, num_options=3
         "current_squad": current_squad,
         "baseline_points": baseline,
         "options": options,
+        "wildcard": {
+            "budget": 100.0,
+            "total_expected_points": round(wildcard_total, 1),
+            "avg_expected_points_per_week": round(wildcard_total / len(weeks), 1),
+            "squad": wildcard_squad,
+            "weeks": wildcard_weeks,
+        },
     }
 
     path = os.path.join(PUBLISH_DIR, "transfers.json")

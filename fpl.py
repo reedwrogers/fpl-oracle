@@ -37,17 +37,16 @@ def get_latest_finished_gameweek() -> int:
     """Most recent completed gameweek.
 
     The event-level ``finished`` flag can lag behind the actual results (it
-    sometimes doesn't flip until the next gameweek begins), so we fall back to
-    fixture data: a gameweek is complete once all of its fixtures have kicked
-    off and recorded a score."""
+    sometimes doesn't flip until the next gameweek begins), so we also derive
+    completion from fixture data (all fixtures kicked off + recorded a score)
+    and take the maximum of the two."""
     events = pd.DataFrame(bootstrap()["events"])
     finished = events.loc[events["finished"] == True, "id"]
-    if not finished.empty:
-        return int(finished.max())
+    event_max = int(finished.max()) if not finished.empty else 0
 
     fixtures = pd.DataFrame(_get_json(f"{config.FPL_API}/fixtures/"))
     if fixtures.empty:
-        return 0
+        return event_max
 
     done = (
         (fixtures["started"] == True)
@@ -61,7 +60,9 @@ def get_latest_finished_gameweek() -> int:
         for gw, grp in fixtures.groupby("event")
         if len(grp) > 0 and grp["done"].all()
     ]
-    return max(completed) if completed else 0
+    fixture_max = max(completed) if completed else 0
+
+    return max(event_max, fixture_max)
 
 
 # --- Data sources -----------------------------------------------------------

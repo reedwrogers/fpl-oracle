@@ -990,7 +990,45 @@ of the way a team name was being formatted. This was fixed!
         });
       }
 
+      if (data.wildcard) {
+        html += renderWildcard(data.wildcard);
+      }
+
       c.innerHTML = html;
+    }
+
+    function renderWildcard(w) {
+      let html = '<h2 style="margin-top:28px;">Wildcard Team <span style="font-size:0.6em;color:#888;">(best £100m squad)</span></h2>';
+      html += '<div class="squad-meta">' +
+        '<span>Total <b>' + w.total_expected_points + '</b> pts</span>' +
+        '<span>Average <b>' + w.avg_expected_points_per_week + '</b> pts/week</span>' +
+        '<span>Budget <b>£' + w.budget + 'm</b></span>' +
+        '</div>';
+
+      const order = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
+      html += '<table class="squad-table">' +
+        '<tr><td colspan="4" style="color:#888;font-size:0.78em;">Player / Team / Cost / Avg pts</td></tr>';
+      order.forEach(pos => {
+        const list = (w.squad || []).filter(p => p.position === pos);
+        if (!list.length) return;
+        html += '<tr><td colspan="4" style="color:#F28C28;font-size:0.75em;padding-top:4px;">' + pos + 's</td></tr>';
+        list.forEach(p => {
+          html += '<tr><td>' + p.name + '</td><td style="color:#999;">' + p.team + '</td>' +
+            '<td class="cost">£' + p.cost + 'm</td><td class="pts">' + p.avg_points + '</td></tr>';
+        });
+      });
+      html += '</table>';
+
+      if (w.weeks && w.weeks.length) {
+        html += '<div class="squad-meta" style="margin-top:10px;">';
+        w.weeks.forEach(wk => {
+          html += '<span>GW' + wk.gameweek + ': <b>' + wk.formation + '</b>' +
+            (wk.captain ? ' · C: ' + wk.captain : '') + '</span>';
+        });
+        html += '</div>';
+      }
+
+      return html;
     }
 
     // --- My squad (live from FPL API) ---
