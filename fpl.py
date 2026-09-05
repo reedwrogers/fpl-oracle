@@ -33,6 +33,15 @@ def get_next_gameweek() -> int:
     return int(next_gw.iloc[0])
 
 
+def get_current_gameweek() -> int | None:
+    """Gameweek currently in progress, or None between gameweeks."""
+    events = pd.DataFrame(bootstrap()["events"])
+    cur = events.loc[events["is_current"], "id"]
+    if cur.empty:
+        return None
+    return int(cur.iloc[0])
+
+
 def get_latest_finished_gameweek() -> int:
     """Most recent completed gameweek.
 

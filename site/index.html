@@ -153,6 +153,40 @@
 
     .column-filter:focus { outline: none; border-color: #F28C28; }
 
+    /* --- Column groups --- */
+    #column-legend {
+      flex: 0 0 auto;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 10px 12px 0;
+      font-size: 0.78em;
+      color: #999;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .legend-item i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    .legend-item.grp-pred i { background: #F28C28; }
+    .legend-item.grp-player i { background: #e8e8e8; }
+    .legend-item.grp-stats i { background: #4CAF50; }
+    .legend-item.grp-fixture i { background: #5AC8E3; }
+
+    #predictions-table thead th.grp-pred { color: #F28C28; }
+    #predictions-table thead th.grp-stats { color: #7CCF80; }
+    #predictions-table thead th.grp-fixture { color: #6AC6E0; }
+
+    #predictions-table thead th.grp-end,
+    #predictions-table tbody td.grp-end { border-right: 1px solid #444; }
+
+    #predictions-table tbody td.grp-pred {
+      color: #F28C28;
+      font-weight: bold;
+      background: rgba(242, 140, 40, 0.07);
+    }
+
+    #predictions-table tbody td.grp-stats { background: rgba(76, 175, 80, 0.05); }
+    #predictions-table tbody td.grp-fixture { background: rgba(90, 200, 227, 0.06); }
+
     tr:last-child td { border-bottom: none; }
 
     .status-bar {
@@ -380,6 +414,12 @@
     <!-- Table (default, full screen) -->
     <section id="panel-table" class="panel active">
       <div id="status-bar" class="status-bar"></div>
+      <div id="column-legend">
+        <span class="legend-item grp-pred"><i></i>Prediction</span>
+        <span class="legend-item grp-player"><i></i>Player</span>
+        <span class="legend-item grp-stats"><i></i>Statistics</span>
+        <span class="legend-item grp-fixture"><i></i>Fixture</span>
+      </div>
       <div id="predictions-container">
         <table id="predictions-table">
           <thead></thead>
@@ -422,6 +462,17 @@
     <section id="panel-blog" class="panel">
       <div class="panel-inner">
         <h2>Model Blog</h2>
+        <div class="post">
+          <div class="post-header">
+            <span class="post-date">2026-09-05</span>
+            <span class="post-title">New season starting</span>
+          </div>
+          <p>
+A new season is underway - worked through some hiccups that come with it being a new season, but it should be smooth from here on out. Predictions from the model are not super calibrated yet, so I will be continuing to monitor our metrics. I have overhauled the interface here for consuming the data on my website as well.<br><br>
+In the coming weeks, I want to really take a step back and look into our model performance. Do we have any extremely correlated attributes? Are our predictions getting better each week? Are we missing anything critical? The pipeline of collecting this data in general has been much of the focus so far in this project, but I am excited to start to optimize the model.
+          </p>
+        </div>
+
         <div class="post">
           <div class="post-header">
             <span class="post-date">2026-03-09</span>
@@ -536,6 +587,57 @@ of the way a team name was being formatted. This was fixed!
           A script runs periodically, before any games that day have begun. If the gameweek is new, then last week's
           predictions are appended to last week's data, and this week's data is grabbed.
         </p>
+        <h3>Data Pipeline</h3>
+        <svg viewBox="0 0 560 690" width="100%" style="max-width:640px;display:block;" role="img" aria-label="FPL Oracle data pipeline diagram">
+          <defs>
+            <marker id="pipe-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 9 5 L 0 9 z" fill="#F28C28"></path>
+            </marker>
+          </defs>
+          <g font-family="'Courier New', Courier, monospace" text-anchor="middle">
+            <!-- Sources -->
+            <rect x="15" y="10" width="255" height="92" rx="6" fill="#141414" stroke="#F28C28"></rect>
+            <text x="142" y="36" font-size="14" font-weight="bold" fill="#F28C28">FPL API</text>
+            <text x="142" y="58" font-size="12" fill="#ddd">players, fixtures,</text>
+            <text x="142" y="76" font-size="12" fill="#ddd">live scores, my squad</text>
+            <rect x="290" y="10" width="255" height="92" rx="6" fill="#141414" stroke="#F28C28"></rect>
+            <text x="417" y="36" font-size="14" font-weight="bold" fill="#F28C28">Understat</text>
+            <text x="417" y="58" font-size="12" fill="#ddd">player xG / xA per 90,</text>
+            <text x="417" y="76" font-size="12" fill="#ddd">team xG rates</text>
+            <!-- Collect -->
+            <line x1="142" y1="102" x2="240" y2="138" stroke="#F28C28" stroke-width="1.5" marker-end="url(#pipe-arrow)"></line>
+            <line x1="417" y1="102" x2="320" y2="138" stroke="#F28C28" stroke-width="1.5" marker-end="url(#pipe-arrow)"></line>
+            <rect x="15" y="140" width="530" height="92" rx="6" fill="#141414" stroke="#F28C28"></rect>
+            <text x="280" y="166" font-size="14" font-weight="bold" fill="#F28C28">Daily run (pipeline.py)</text>
+            <text x="280" y="188" font-size="12" fill="#ddd">write actuals for the finished GW,</text>
+            <text x="280" y="206" font-size="12" fill="#ddd">build features for the upcoming GW</text>
+            <!-- Store -->
+            <line x1="280" y1="232" x2="280" y2="268" stroke="#F28C28" stroke-width="1.5" marker-end="url(#pipe-arrow)"></line>
+            <rect x="15" y="270" width="530" height="70" rx="6" fill="#141414" stroke="#F28C28"></rect>
+            <text x="280" y="296" font-size="14" font-weight="bold" fill="#F28C28">data/ files</text>
+            <text x="280" y="318" font-size="12" fill="#ddd">X_{gw}.csv features, y_{gw}.csv actuals</text>
+            <!-- Model -->
+            <line x1="280" y1="340" x2="280" y2="376" stroke="#F28C28" stroke-width="1.5" marker-end="url(#pipe-arrow)"></line>
+            <rect x="15" y="378" width="530" height="92" rx="6" fill="#141414" stroke="#F28C28"></rect>
+            <text x="280" y="404" font-size="14" font-weight="bold" fill="#F28C28">Model (model.py)</text>
+            <text x="280" y="426" font-size="12" fill="#ddd">train on past X / y pairs,</text>
+            <text x="280" y="444" font-size="12" fill="#ddd">predict the live gameweek</text>
+            <!-- Publish -->
+            <line x1="280" y1="470" x2="280" y2="506" stroke="#F28C28" stroke-width="1.5" marker-end="url(#pipe-arrow)"></line>
+            <rect x="15" y="508" width="530" height="92" rx="6" fill="#141414" stroke="#F28C28"></rect>
+            <text x="280" y="534" font-size="14" font-weight="bold" fill="#F28C28">Publish</text>
+            <text x="280" y="556" font-size="12" fill="#ddd">predictions.csv, metrics.json,</text>
+            <text x="280" y="574" font-size="12" fill="#ddd">transfer + squad picks</text>
+            <!-- Site -->
+            <line x1="280" y1="600" x2="280" y2="636" stroke="#F28C28" stroke-width="1.5" marker-end="url(#pipe-arrow)"></line>
+            <rect x="15" y="638" width="530" height="42" rx="6" fill="#1a1a1a" stroke="#F28C28"></rect>
+            <text x="280" y="664" font-size="14" font-weight="bold" fill="#F28C28">fpl.reedrogers.xyz</text>
+          </g>
+        </svg>
+        <p style="color:#888;font-size:0.85em;">
+          The site always shows the gameweek in progress; once its last match ends, that week's actuals
+          are recorded and predictions roll forward to the next gameweek.
+        </p>
       </div>
     </section>
 
@@ -548,6 +650,7 @@ of the way a team name was being formatted. This was fixed!
             <li><a href="/data/predictions.csv" download>predictions.csv</a></li>
             <li><a href="/data/metrics.json" download>metrics.json</a></li>
             <li><a href="/data/squad.json" download>squad.json</a></li>
+            <li><a href="/data/transfers.json" download>transfers.json</a></li>
             <li><a href="/data/myteam.json" download>myteam.json</a></li>
             <li><a href="/data/correlation.json" download>correlation.json</a></li>
           </ul>
@@ -573,6 +676,56 @@ of the way a team name was being formatted. This was fixed!
     let sortColumn = null;
     let sortAscending = true;
     let columnFilters = {}; // column index -> filter string
+
+    // Column groups: prediction (the model output), player (identity),
+    // stats (per-player numbers), fixture (match context). Anything not
+    // listed here falls back to stats.
+    const COLUMN_GROUPS = {
+      predicted_points: 'pred',
+      full_name: 'player', team_name: 'player', position: 'player', cost: 'player',
+      gameweek: 'fixture', is_at_home: 'fixture',
+      team_league_position: 'fixture', opponent_league_position: 'fixture',
+      opponent_xg_per_90: 'fixture', opponent_xg_against_per_90: 'fixture',
+      opponent_goals_conceded_last_3: 'fixture',
+    };
+
+    function groupOf(header) {
+      return COLUMN_GROUPS[header] || 'stats';
+    }
+
+    // Short display labels; unknown columns fall back to the raw header.
+    const DISPLAY_NAMES = {
+      full_name: 'Player', team_name: 'Team', position: 'Pos',
+      predicted_points: 'Pred Pts', cost: 'Cost',
+      playing_time_min_percentage: 'Min%', xg_per_90: 'xG/90', xag_per_90: 'xAG/90',
+      yellows_per_90: 'Y/90', reds_per_90: 'R/90',
+      clearances_blocks_interceptions_per_90: 'CBI/90', tackles_per_90: 'Tkl/90',
+      team_xg_per_90: 'Team xG', team_xg_against_per_90: 'Team xGA',
+      opponent_xg_per_90: 'Opp xG', opponent_xg_against_per_90: 'Opp xGA',
+      opponent_league_position: 'Opp Pos', gameweek: 'GW', is_at_home: 'H/A',
+      team_league_position: 'Team Pos',
+      points_last_3: 'Pts L3', xg_last_3: 'xG L3', minutes_last_3: 'Min L3',
+      total_minutes: 'Tot Min', is_penalty_taker: 'Pens',
+      opponent_goals_conceded_last_3: 'Opp GC L3', ownership_percent: 'Own%',
+      influence_per_90: 'Infl/90', creativity_per_90: 'Crea/90',
+      threat_per_90: 'Thr/90', ict_per_90: 'ICT/90',
+    };
+
+    function displayName(header) {
+      return DISPLAY_NAMES[header] || header;
+    }
+
+    // Columns shown rounded to 2 decimals (display only; raw values remain
+    // in the CSV and are what the model trains on).
+    const ROUND_2_PLACES = new Set(['influence_per_90', 'creativity_per_90', 'threat_per_90']);
+
+    function displayValue(header, cell) {
+      if (ROUND_2_PLACES.has(header)) {
+        const n = parseFloat(cell);
+        if (!isNaN(n)) return n.toFixed(2);
+      }
+      return cell;
+    }
 
     function loadCSV() {
       fetch('/data/predictions.csv?_=' + Date.now())
@@ -605,7 +758,10 @@ of the way a team name was being formatted. This was fixed!
       const headerRow = document.createElement('tr');
       currentHeaders.forEach((h, i) => {
         const th = document.createElement('th');
-        th.textContent = h;
+        th.textContent = displayName(h);
+        th.title = h;
+        th.className = 'grp-' + groupOf(h);
+        if (groupOf(currentHeaders[i + 1]) !== groupOf(h)) th.classList.add('grp-end');
         th.onclick = () => sortByColumn(i);
         headerRow.appendChild(th);
       });
@@ -615,7 +771,8 @@ of the way a team name was being formatted. This was fixed!
       filterRow.className = 'filter-row';
       currentHeaders.forEach((h, i) => {
         const th = document.createElement('th');
-        th.className = 'filter-cell';
+        th.className = 'filter-cell grp-' + groupOf(h);
+        if (groupOf(currentHeaders[i + 1]) !== groupOf(h)) th.classList.add('grp-end');
         th.onclick = (e) => e.stopPropagation();
         const input = document.createElement('input');
         input.type = 'text';
@@ -641,9 +798,11 @@ of the way a team name was being formatted. This was fixed!
       const visible = currentRows.filter(row => matchesFilters(row));
       visible.forEach(row => {
         const tr = document.createElement('tr');
-        row.forEach(cell => {
+        row.forEach((cell, i) => {
           const td = document.createElement('td');
-          td.textContent = cell;
+          td.textContent = displayValue(currentHeaders[i], cell);
+          td.className = 'grp-' + groupOf(currentHeaders[i]);
+          if (groupOf(currentHeaders[i + 1]) !== groupOf(currentHeaders[i])) td.classList.add('grp-end');
           tr.appendChild(td);
         });
         tbody.appendChild(tr);

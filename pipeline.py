@@ -68,34 +68,59 @@ def write_my_team() -> None:
 def run() -> None:
     last_finished = fpl.get_latest_finished_gameweek()
     next_gw = fpl.get_next_gameweek()
+    live_gw = fpl.get_current_gameweek()
 
-    changed = False
+    # Publish target: the gameweek in progress while it is still live,
+    # otherwise the upcoming gameweek. A future gameweek is never published
+    # while its predecessor is live. `last_finished` (derived from fixture
+    # scores) takes precedence so a just-finished gameweek rolls forward even
+    # if the API `is_current` flag lags behind the last whistle.
+    if live_gw is not None and live_gw > last_finished:
+        publish_gw = live_gw
+    else:
+        publish_gw = next_gw
 
-    # 1) Record actual points for the most recently finished gameweek.
+    publish_ready = False
+
+    # 1) Record actual points for the most recently finished gameweek, as soon
+    #    as its last fixture has a score.
     if last_finished >= 1:
         y_path = config.DATA_DIR / f"y_{last_finished}.csv"
         if not y_path.exists():
             print(f"Recording actuals for finished GW {last_finished}")
             write_y(last_finished)
-            changed = True
+            publish_ready = True
 
-    # 2) Generate/refresh features for the upcoming gameweek. Regenerate when a
-    #    gameweek just finished (new stats available) or the file is missing.
+    # 2) Prep features for the upcoming gameweek early (waiting state) and
+    #    refresh them once new actuals land. Building a future gameweek alone
+    #    never triggers a publish.
     if next_gw >= 1:
         x_path = config.DATA_DIR / f"X_{next_gw}.csv"
-        if not x_path.exists() or changed:
-            print(f"Building features for GW {next_gw}")
+        if not x_path.exists() or publish_ready:
+            action = "Building" if not x_path.exists() else "Refreshing"
+            print(f"{action} features for GW {next_gw}")
             write_x(next_gw)
-            changed = True
+            if next_gw == publish_gw:
+                publish_ready = True
+            else:
+                print(f"GW {next_gw} features ready, waiting for GW {publish_gw} to finish")
 
-    # 3) Refresh the manager's own squad for the site (cheap, always run).
+    # 3) Ensure the publish target's features exist (e.g. fresh checkout).
+    if publish_gw >= 1 and publish_gw != next_gw:
+        target_x = config.DATA_DIR / f"X_{publish_gw}.csv"
+        if not target_x.exists():
+            print(f"Building features for GW {publish_gw}")
+            write_x(publish_gw)
+            publish_ready = True
+
+    # 4) Refresh the manager's own squad for the site (cheap, always run).
     write_my_team()
 
-    # 4) Publish only when something actually changed.
-    if changed:
-        publish(next_gw)
+    # 5) Publish only the publish target, and only when it has new data.
+    if publish_ready:
+        publish(publish_gw)
     else:
-        print(f"Up to date (next GW {next_gw}, finished {last_finished})")
+        print(f"Up to date (live GW {live_gw}, next GW {next_gw}, finished {last_finished})")
 
 
 def preseason() -> None:
