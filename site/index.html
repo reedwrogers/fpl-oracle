@@ -403,6 +403,7 @@
     <span class="brand">FPL Oracle</span>
     <button class="navtab active" data-tab="table">Table</button>
     <button class="navtab" data-tab="squad">Squad</button>
+    <button class="navtab" data-tab="league">Mini-League</button>
     <button class="navtab" data-tab="performance">Performance</button>
     <button class="navtab" data-tab="correlation">Correlation</button>
     <button class="navtab" data-tab="blog">Blog</button>
@@ -435,6 +436,14 @@
         <div id="myteam-content" class="empty-state">Loading my team...</div>
         <h2 style="margin-top:28px;">Transfer Recommendations <span style="font-size:0.6em;color:#888;">(maximize points over the next 5 GWs)</span></h2>
         <div id="transfers-content" class="empty-state">Loading recommendations...</div>
+      </div>
+    </section>
+
+    <!-- Mini-League: standings, ownership, league-aware transfer lens -->
+    <section id="panel-league" class="panel">
+      <div class="panel-inner">
+        <h2>Mini-League</h2>
+        <div id="league-content" class="empty-state">Loading mini-league...</div>
       </div>
     </section>
 
@@ -652,6 +661,7 @@ of the way a team name was being formatted. This was fixed!
             <li><a href="/data/squad.json" download>squad.json</a></li>
             <li><a href="/data/transfers.json" download>transfers.json</a></li>
             <li><a href="/data/myteam.json" download>myteam.json</a></li>
+            <li><a href="/data/minileague.json" download>minileague.json</a></li>
             <li><a href="/data/correlation.json" download>correlation.json</a></li>
           </ul>
         </div>
@@ -1255,6 +1265,106 @@ of the way a team name was being formatted. This was fixed!
       return html;
     }
 
+    // --- Mini-League ---
+    function loadMiniLeague() {
+      fetch('/data/minileague.json?_=' + Date.now())
+        .then(res => {
+          if (!res.ok) throw new Error('No mini-league data');
+          return res.json();
+        })
+        .then(data => renderMiniLeague(data))
+        .catch(() => {
+          document.getElementById('league-content').innerHTML =
+            '<div class="empty-state">Mini-league data will appear here once the publisher runs.</div>';
+        });
+    }
+
+    function leaguePlayerLine(p) {
+      const pred = p.predicted_points != null ? p.predicted_points : '\u2014';
+      const own = p.i_own ? ' <span style="color:#4CAF50;">(I own)</span>' : '';
+      return '<b>' + p.name + '</b>' +
+        ' <span style="color:#666;">(' + p.position + ', ' + p.team +
+        ', owned by ' + p.owners + ', pred ' + pred + ')</span>' + own;
+    }
+
+    function renderMiniLeague(data) {
+      const c = document.getElementById('league-content');
+      c.innerHTML = '';
+      if (!data || !data.standings) return;
+
+      let html = '<div class="squad-meta">' +
+        '<span>Rank <b>#' + data.my_rank + ' of ' + data.standings.length + '</b></span>' +
+        '<span>Behind leader <b>' + data.points_behind_leader + '</b> pts</span>' +
+        '<span>Mode <b>' + data.mode + '</b></span>' +
+        '</div>';
+
+      html += '<h3>Standings</h3><table class="squad-table">' +
+        '<tr><td colspan="4" style="color:#888;font-size:0.78em;">Team / Manager / Total / Gap to me</td></tr>';
+      data.standings.forEach((t, i) => {
+        const gap = (data.my_total - t.total_points);
+        const gapTxt = gap === 0 ? '\u2014' : (gap > 0 ? '+' + gap : '' + gap);
+        const name = (i + 1) + '. ' + t.team_name + (t.is_me ? ' <b style="color:#F28C28;">*</b>' : '');
+        html += '<tr><td>' + name + '</td><td style="color:#999;">' + t.manager + '</td>' +
+          '<td class="pts">' + t.total_points + '</td><td class="cost">' + gapTxt + '</td></tr>';
+      });
+      html += '</table>';
+
+      html += '<h3 style="margin-top:18px;">Captains</h3><table class="squad-table">';
+      (data.captains || []).forEach(cc => {
+        html += '<tr><td>' + cc.team_name + (cc.is_me ? ' <b style="color:#F28C28;">*</b>' : '') +
+          '</td><td class="pts">' + cc.captain + '</td></tr>';
+      });
+      html += '</table>';
+
+      html += '<h3 style="margin-top:18px;">Block targets</h3>';
+      if ((data.block_targets || []).length === 0) {
+        html += '<div class="empty-state">Nothing to block: I own every consensus pick.</div>';
+      } else {
+        data.block_targets.forEach(p => {
+          html += '<div class="transfer-card"><div class="transfer-line out">' +
+            leaguePlayerLine(p) + '</div>' +
+            '<div class="fixtures">Owned by: ' + p.owned_by.join(', ') + '</div></div>';
+        });
+      }
+
+      html += '<h3 style="margin-top:18px;">Differential targets</h3>';
+      if ((data.differential_targets || []).length === 0) {
+        html += '<div class="empty-state">No standout differentials this week.</div>';
+      } else {
+        data.differential_targets.forEach(p => {
+          html += '<div class="transfer-card"><div class="transfer-line in">' +
+            leaguePlayerLine(p) + '</div>' +
+            '<div class="fixtures">Owned by: ' + (p.owned_by.join(', ') || 'nobody') + '</div></div>';
+        });
+      }
+
+      html += '<h3 style="margin-top:18px;">my differentials</h3>';
+      if ((data.my_differentials || []).length === 0) {
+        html += '<div class="empty-state">I own nothing unique. Consider one differential if chasing.</div>';
+      } else {
+        html += '<table class="squad-table">';
+        data.my_differentials.forEach(p => {
+          const pred = p.predicted_points != null ? p.predicted_points : '\u2014';
+          html += '<tr><td>' + p.name + '</td><td style="color:#999;">' + p.team + '</td>' +
+            '<td class="pts">' + pred + '</td></tr>';
+        });
+        html += '</table>';
+      }
+
+      html += '<h3 style="margin-top:18px;">Rival overlap</h3>';
+      (data.rivals || []).forEach(r => {
+        const ahead = r.gap < 0 ? Math.abs(r.gap) + ' ahead of me' : r.gap > 0 ? r.gap + ' behind me' : 'level with me';
+        html += '<div class="transfer-card">' +
+          '<div class="transfer-head"><span>' + r.team_name + ' (' + r.manager + ')</span>' +
+          '<span class="pts">' + r.total_points + ' pts · ' + ahead + '</span></div>' +
+          '<div class="transfer-line">Shares <b>' + r.shared_players + '</b> players with me · Captain: <b>' + r.captain + '</b></div>' +
+          '<div class="fixtures">Only they own: ' + (r.only_they_own.join(', ') || '\u2014') + '</div>' +
+          '<div class="fixtures">Only I own: ' + (r.only_i_own.join(', ') || '\u2014') + '</div></div>';
+      });
+
+      c.innerHTML = html;
+    }
+
     // Delegated click handler for the metrics position selector. Registered once
     // here (not inside renderMetrics) so it survives innerHTML re-renders.
     document.getElementById('metrics-content').addEventListener('click', (e) => {
@@ -1278,6 +1388,7 @@ of the way a team name was being formatted. This was fixed!
     loadMetrics();
     loadMyTeam();
     loadTransfers();
+    loadMiniLeague();
     loadCorrelation();
   </script>
 </body>

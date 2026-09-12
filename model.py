@@ -429,6 +429,14 @@ def publish(gameweek=None):
     except Exception as e:
         print(f"  Squad optimizer skipped: {e}")
 
+    # Refresh the mini-league view (standings, ownership, differentials).
+    print("  Running mini-league publisher...")
+    try:
+        from minileague import publish as publish_minileague
+        publish_minileague()
+    except Exception as e:
+        print(f"  Mini-league publisher skipped: {e}")
+
     return csv_df
 
 

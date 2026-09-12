@@ -15,6 +15,17 @@ FPL_API = "https://fantasy.premierleague.com/api"
 # FPL team/entry ID surfaced in the "My Squad" section of the site.
 MY_TEAM_ID = 2162827
 
+# Mini-league entry IDs (mine first) surfaced in the "Mini-League" section.
+MINI_LEAGUE_IDS = [
+    2162827,  # Mo Salad (me)
+    7469346,  # Austin's Team
+    4686974,  # drew
+    2407978,  # MurderOnZidanesFloor
+    6131978,  # Scousers
+    8044473,  # Areola Inspector
+    89061,    # Neville wears prada
+]
+
 # Understat labels a season by its start year.
 SEASON = "2026"        # current / upcoming season
 PRIOR_SEASON = "2025"  # last completed season (used pre-season / backfill)
