@@ -596,6 +596,23 @@ of the way a team name was being formatted. This was fixed!
           A script runs periodically, before any games that day have begun. If the gameweek is new, then last week's
           predictions are appended to last week's data, and this week's data is grabbed.
         </p>
+        <h3>The Model</h3>
+        <p>
+          Predictions come from a <b>gradient-boosted decision tree</b>
+          (<b>HistGradientBoostingRegressor</b>, scikit-learn) trained on every completed gameweek's
+          feature/actuals pairs. Team and position are one-hot encoded; all other features pass through
+          as-is, and trees handle missing values natively.
+        </p>
+        <p>
+          Hyperparameters were chosen with an <b>Optuna</b> search (20 trials, leave-one-gameweek-out
+          backtest) that selects on <b>mean Spearman rank correlation</b> rather than raw point error —
+          every downstream use (squad picker, transfers, captaincy) consumes the <i>ordering</i> of players,
+          not exact scores. Current settings: learning_rate 0.0099, max_depth 2, max_iter 496,
+          min_samples_leaf 18, l2_regularization 3.40. Latest backtest averages: MAE 2.30,
+          Spearman 0.32, Top-20 overlap 5.8/20 per gameweek.
+          The predictions table also shows <b>GW+1/GW+2 lookahead</b> columns: the same model
+          re-run on each coming week's fixture context (form frozen as of today), for viewing only.
+        </p>
         <h3>Data Pipeline</h3>
         <svg viewBox="0 0 560 690" width="100%" style="max-width:640px;display:block;" role="img" aria-label="FPL Oracle data pipeline diagram">
           <defs>
@@ -691,7 +708,7 @@ of the way a team name was being formatted. This was fixed!
     // stats (per-player numbers), fixture (match context). Anything not
     // listed here falls back to stats.
     const COLUMN_GROUPS = {
-      predicted_points: 'pred',
+      predicted_points: 'pred', pred_gw_plus1: 'pred', pred_gw_plus2: 'pred',
       full_name: 'player', team_name: 'player', position: 'player', cost: 'player',
       gameweek: 'fixture', is_at_home: 'fixture',
       team_league_position: 'fixture', opponent_league_position: 'fixture',
@@ -706,7 +723,8 @@ of the way a team name was being formatted. This was fixed!
     // Short display labels; unknown columns fall back to the raw header.
     const DISPLAY_NAMES = {
       full_name: 'Player', team_name: 'Team', position: 'Pos',
-      predicted_points: 'Pred Pts', cost: 'Cost',
+      predicted_points: 'Pred Pts', pred_gw_plus1: 'GW+1', pred_gw_plus2: 'GW+2',
+      cost: 'Cost',
       playing_time_min_percentage: 'Min%', xg_per_90: 'xG/90', xag_per_90: 'xAG/90',
       yellows_per_90: 'Y/90', reds_per_90: 'R/90',
       clearances_blocks_interceptions_per_90: 'CBI/90', tackles_per_90: 'Tkl/90',

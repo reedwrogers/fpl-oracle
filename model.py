@@ -30,7 +30,7 @@ def _minutes_threshold(gameweek: int) -> int:
     return round(0.6 * window * 90)
 
 
-def predict(gameweek: int, verbose: bool = True):
+def _file_map() -> dict[int, dict[str, str]]:
     files = os.listdir(DATA_DIR)
     pattern = re.compile(r"^(X|y)_(\d+)\.csv$")
 
@@ -40,17 +40,21 @@ def predict(gameweek: int, verbose: bool = True):
         if match:
             kind, num = match.groups()
             file_map.setdefault(int(num), {})[kind] = f
+    return file_map
 
-    # Collect paired X/y data
+
+def _training_data(exclude_gw: int | None = None) -> pd.DataFrame:
+    """All minute-filtered X/y pairs, optionally excluding one gameweek
+    (avoids leakage when predicting a GW that has actuals; prior-season data
+    carries forward across the season reset)."""
+    file_map = _file_map()
     all_pairs = {
         gw: pair
         for gw, pair in file_map.items()
         if "X" in pair and "y" in pair
     }
 
-    # Train on every completed gameweek except the target (avoids leakage and
-    # carries prior-season data forward across the season reset).
-    train_gws = sorted(gw for gw in all_pairs if gw != gameweek)
+    train_gws = sorted(gw for gw in all_pairs if gw != exclude_gw)
     if not train_gws:
         raise ValueError("No training data found.")
 
@@ -69,13 +73,10 @@ def predict(gameweek: int, verbose: bool = True):
     if not merged_dfs:
         raise ValueError("No training data found.")
 
-    train_df = pd.concat(merged_dfs, ignore_index=True)
+    return pd.concat(merged_dfs, ignore_index=True)
 
-    if verbose:
-        print(
-            f"Training on {len(train_df)} instances across {len(merged_dfs)} gameweeks"
-        )
 
+def _fit(train_df: pd.DataFrame, verbose: bool = True) -> Pipeline:
     X_train = train_df.drop(columns=["gw_points", "gw_minutes", "full_name", "gameweek"])
     y_train = train_df["gw_points"]
 
@@ -94,11 +95,15 @@ def predict(gameweek: int, verbose: bool = True):
             ("prep", preprocessor),
             (
                 "model",
+                # Rank-tuned hyperparams (Study B winner, seed 42, 20 trials):
+                # selected on mean Spearman under leave-one-gameweek-out
+                # backtest. See experiments/rank_vs_mae.py + champ_params.json.
                 HistGradientBoostingRegressor(
-                    learning_rate=0.01,
-                    max_depth=4,
-                    max_iter=200,
-                    min_samples_leaf=20,
+                    learning_rate=0.009930253316028368,
+                    max_depth=2,
+                    max_iter=496,
+                    min_samples_leaf=18,
+                    l2_regularization=3.4019540836694557,
                     random_state=42,
                 ),
             ),
@@ -106,6 +111,21 @@ def predict(gameweek: int, verbose: bool = True):
     )
 
     model.fit(X_train, y_train)
+    if verbose:
+        print(
+            f"Training on {len(train_df)} instances "
+            f"across {train_df['gameweek'].nunique()} gameweeks"
+        )
+    return model
+
+
+def predict(gameweek: int, verbose: bool = True):
+    file_map = _file_map()
+
+    # Train on every completed gameweek except the target (avoids leakage and
+    # carries prior-season data forward across the season reset).
+    train_df = _training_data(exclude_gw=gameweek)
+    model = _fit(train_df, verbose=verbose)
 
     if gameweek not in file_map or "X" not in file_map[gameweek]:
         raise ValueError(f"X_{gameweek}.csv not found")
@@ -138,6 +158,48 @@ def predict(gameweek: int, verbose: bool = True):
         metrics = _evaluate(pred_df, gameweek, verbose=verbose)
 
     return pred_df.sort_values("predicted_points", ascending=False), metrics
+
+
+def predict_future(
+    gameweek: int,
+    ref_names: set[str],
+    col: str = "predicted_points",
+    verbose: bool = True,
+):
+    """Predict a future gameweek for viewing only (main-table GW+1/GW+2 columns).
+
+    Uses an existing X file when one is on disk, otherwise builds the feature
+    frame in memory from current form + that week's fixture context — never
+    writes to data/, never trains on the target (it has no actuals). Returns a
+    DataFrame with full_name + one prediction column, or None if the frame
+    can't be built (e.g. no fixtures that far out)."""
+    x_path = os.path.join(DATA_DIR, f"X_{gameweek}.csv")
+    if os.path.exists(x_path):
+        frame = pd.read_csv(x_path)
+    else:
+        try:
+            import features as features_mod
+
+            frame = features_mod.build_features(gameweek)
+        except Exception as e:
+            if verbose:
+                print(f"  Skipping GW{gameweek} lookahead: {e}")
+            return None
+
+    train_df = _training_data(exclude_gw=None)
+    model = _fit(train_df, verbose=False)
+
+    feat_cols = [
+        c for c in train_df.drop(
+            columns=["gw_points", "gw_minutes", "full_name", "gameweek"]
+        ).columns
+        if c in frame.columns
+    ]
+    sub = frame[frame["full_name"].isin(ref_names)].copy()
+    if sub.empty:
+        return None
+    preds = np.round(np.asarray(model.predict(sub[feat_cols])), 2)
+    return pd.DataFrame({"full_name": sub["full_name"].to_numpy(), col: preds})
 
 
 def _round(v, nd=3):
@@ -367,13 +429,30 @@ def publish(gameweek=None):
 
     pred_df, _ = predict(gameweek, verbose=True)
 
+    # View-only lookahead: predict the next two gameweeks for the same players
+    # (current form + each week's fixture context, built in memory — never
+    # written to data/ or consumed by the optimizer).
+    lookahead_names = set(pred_df["full_name"])
+    for k in (1, 2):
+        fut = predict_future(
+            gameweek + k, lookahead_names, col=f"pred_gw_plus{k}", verbose=True
+        )
+        if fut is not None:
+            print(f"  GW{gameweek + k} lookahead: {len(fut)} players")
+            pred_df = pred_df.merge(fut, on="full_name", how="left")
+
     # Merge predicted points onto the full feature matrix so the published table
     # carries every statistic the model used (no actuals/gw_minutes — those
     # aren't known ahead of a gameweek).
     X_path = os.path.join(DATA_DIR, f"X_{gameweek}.csv")
     X = pd.read_csv(X_path)
 
-    csv_df = pred_df[["full_name", "predicted_points"]].merge(
+    # Lookahead columns sit right behind this week's prediction (only the ones
+    # that were actually computed).
+    lookahead_cols = [
+        c for c in ("pred_gw_plus1", "pred_gw_plus2") if c in pred_df.columns
+    ]
+    csv_df = pred_df[["full_name", "predicted_points", *lookahead_cols]].merge(
         X, on="full_name", how="inner"
     )
     csv_df = csv_df.rename(columns={"player_position": "position"})
@@ -386,6 +465,7 @@ def publish(gameweek=None):
     # Lead with the most-consumed columns; everything else keeps schema order.
     lead_cols = [
         "full_name", "team_name", "position", "predicted_points",
+        *lookahead_cols,
         "xg_per_90", "xag_per_90",
         "team_league_position", "opponent_league_position", "points_last_3",
     ]
