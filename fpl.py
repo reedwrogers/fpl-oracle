@@ -106,6 +106,45 @@ def get_latest_finished_gameweek() -> int:
     return max(event_max, fixture_max)
 
 
+def last_slot_fulltime_observed(gameweek: int) -> bool:
+    """Whether the gameweek's last kickoff slot looks finished (cheap signal).
+
+    A single ``/event/{gw}/live/`` call: a completed game almost always leaves
+    a 90-minute player on the pitch (only 5 subs allowed), so one 90'
+    appearance from either team of *every* fixture in the last kickoff slot
+    means the slot — and hence the gameweek — is over. This fires earlier than
+    the official ``finished`` flags, which can lag the last whistle by hours.
+    Bonus points may not have landed yet, so callers must not record actuals
+    off this alone.
+    """
+    fixtures = pd.DataFrame(_get_json(f"{config.FPL_API}/fixtures/"))
+    grp = fixtures[fixtures["event"] == gameweek]
+    if len(grp) == 0:
+        return False
+    last_slot = grp[grp["kickoff_time"] == grp["kickoff_time"].max()]
+
+    team_of: dict[int, int] = {}
+    for e in bootstrap()["elements"]:
+        try:
+            team_of[int(e["id"])] = int(e["team"])
+        except (KeyError, TypeError, ValueError):
+            continue
+
+    live = _get_json(f"{config.FPL_API}/event/{gameweek}/live/")
+    fulltime_teams = set()
+    for el in live.get("elements", []):
+        try:
+            if int((el.get("stats") or {}).get("minutes") or 0) >= 90:
+                fulltime_teams.add(team_of[int(el["id"])])
+        except (KeyError, TypeError, ValueError):
+            continue
+
+    for _, fx in last_slot.iterrows():
+        if fx["team_h"] not in fulltime_teams and fx["team_a"] not in fulltime_teams:
+            return False
+    return True
+
+
 # --- Data sources -----------------------------------------------------------
 
 

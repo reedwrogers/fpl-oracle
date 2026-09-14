@@ -16,6 +16,7 @@ Usage:
 
 import json
 import sys
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 
@@ -68,11 +69,37 @@ def remove_provisional_actuals() -> bool:
             continue
         if gw >= 20:
             continue
-        if not fpl.is_gameweek_finished(gw):
-            print(f"Removing provisional actuals for unfinished GW {gw}")
-            path.unlink()
-            removed = True
+        if fpl.is_gameweek_finished(gw):
+            marker = config.DATA_DIR / f".gw{gw}_fulltime"
+            if marker.exists():
+                marker.unlink()
+            continue
+        if fulltime_ready(gw):
+            # Deliberately recorded after the bonus delay; keep.
+            continue
+        print(f"Removing provisional actuals for unfinished GW {gw}")
+        path.unlink()
+        removed = True
     return removed
+
+
+def fulltime_ready(gameweek: int, now: datetime | None = None) -> bool:
+    """Whether the 90-minute full-time signal for a gameweek is old enough.
+
+    True only once ``FULLTIME_BONUS_DELAY_HOURS`` have passed since the first
+    sighting (stamped to ``.gw{gw}_fulltime``), so bonus points have landed
+    before actuals are recorded.
+    """
+    now = now or datetime.now(timezone.utc)
+    try:
+        observed = datetime.fromisoformat(
+            (config.DATA_DIR / f".gw{gameweek}_fulltime").read_text().strip()
+        )
+    except (FileNotFoundError, ValueError):
+        return False
+    if observed.tzinfo is None:
+        observed = observed.replace(tzinfo=timezone.utc)
+    return now - observed >= timedelta(hours=config.FULLTIME_BONUS_DELAY_HOURS)
 
 
 def write_my_team() -> None:
@@ -100,6 +127,37 @@ def run() -> None:
     next_gw = fpl.get_next_gameweek()
     live_gw = fpl.get_current_gameweek()
 
+    publish_ready = False
+
+    # Early full-time signal for the gameweek after the last officially
+    # finished one: a 90-minute player in the live endpoint for every fixture
+    # of its last kickoff slot. The official flags can lag the last whistle
+    # by hours; the first sighting is stamped to disk so separate cron runs
+    # observe the same bonus-delay window, and actuals are recorded only once
+    # FULLTIME_BONUS_DELAY_HOURS have passed (bonus points have landed).
+    candidate = last_finished + 1
+    if not (config.DATA_DIR / f"y_{candidate}.csv").exists():
+        if fpl.last_slot_fulltime_observed(candidate):
+            marker = config.DATA_DIR / f".gw{candidate}_fulltime"
+            if not marker.exists():
+                marker.write_text(datetime.now(timezone.utc).isoformat())
+                print(f"GW {candidate} full-time observed, waiting "
+                      f"{config.FULLTIME_BONUS_DELAY_HOURS}h for bonus points")
+            elif fulltime_ready(candidate):
+                print(f"Recording actuals for finished GW {candidate} "
+                      f"(full-time signal + bonus delay)")
+                write_y(candidate)
+                last_finished = candidate
+                publish_ready = True
+            else:
+                observed = datetime.fromisoformat(marker.read_text().strip())
+                if observed.tzinfo is None:
+                    observed = observed.replace(tzinfo=timezone.utc)
+                wait_until = observed + timedelta(
+                    hours=config.FULLTIME_BONUS_DELAY_HOURS)
+                print(f"GW {candidate} full-time seen, bonus wait until "
+                      f"{wait_until.isoformat()}")
+
     # Publish target: the gameweek in progress while it is still live,
     # otherwise the upcoming gameweek. A future gameweek is never published
     # while its predecessor is live. `last_finished` (every fixture finished)
@@ -109,8 +167,6 @@ def run() -> None:
         publish_gw = live_gw
     else:
         publish_gw = next_gw
-
-    publish_ready = False
 
     # 1) Record actual points for the most recently finished gameweek, once
     #    FPL marks all of its fixtures finished (a live scoreline alone does

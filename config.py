@@ -135,6 +135,12 @@ UNDERSTAT_TEAMS_PRIOR = [
     "Everton", "Brentford", "Nottingham Forest", "Sunderland", "Burnley", "Leeds",
 ]
 
+# Hours to wait after the 90-minute full-time signal (a 90' appearance in the
+# live endpoint for the gameweek's last kickoff slot) before treating the
+# gameweek as complete. Gives bonus points time to land so recorded actuals
+# are final, not provisional.
+FULLTIME_BONUS_DELAY_HOURS = 4
+
 # --- Feature engineering knobs ----------------------------------------------
 
 # Players no longer on any FPL team (left the league/club) and still listed in
