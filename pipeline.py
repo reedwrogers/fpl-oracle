@@ -51,6 +51,30 @@ def publish(gameweek: int | None = None) -> None:
     model.publish(gameweek)
 
 
+def remove_provisional_actuals() -> bool:
+    """Delete actuals files for gameweeks that are not actually finished.
+
+    A past run may have recorded ``y_<gw>.csv`` from a live scoreline before
+    the gameweek completed (score presence is not completion). Such files
+    poison training/eval, and the write-once guard would otherwise keep them
+    forever. Only current-season gameweeks (gw < 20, see model ordering) are
+    considered so prior-season training data is never touched.
+    """
+    removed = False
+    for path in sorted(config.DATA_DIR.glob("y_*.csv")):
+        try:
+            gw = int(path.stem.split("_")[1])
+        except (IndexError, ValueError):
+            continue
+        if gw >= 20:
+            continue
+        if not fpl.is_gameweek_finished(gw):
+            print(f"Removing provisional actuals for unfinished GW {gw}")
+            path.unlink()
+            removed = True
+    return removed
+
+
 def write_my_team() -> None:
     """Fetch the manager's FPL squad and write it for the site (idempotent)."""
     config.PUBLISH_DIR.mkdir(parents=True, exist_ok=True)
@@ -66,14 +90,20 @@ def write_my_team() -> None:
 
 
 def run() -> None:
+    # 0) Drop any actuals recorded early from a live scoreline so they are
+    #    re-recorded once the gameweek truly finishes (no self-healing here
+    #    means a partial snapshot would be kept forever by the write-once
+    #    guard in step 1).
+    remove_provisional_actuals()
+
     last_finished = fpl.get_latest_finished_gameweek()
     next_gw = fpl.get_next_gameweek()
     live_gw = fpl.get_current_gameweek()
 
     # Publish target: the gameweek in progress while it is still live,
     # otherwise the upcoming gameweek. A future gameweek is never published
-    # while its predecessor is live. `last_finished` (derived from fixture
-    # scores) takes precedence so a just-finished gameweek rolls forward even
+    # while its predecessor is live. `last_finished` (every fixture finished)
+    # takes precedence so a just-finished gameweek rolls forward even
     # if the API `is_current` flag lags behind the last whistle.
     if live_gw is not None and live_gw > last_finished:
         publish_gw = live_gw
@@ -82,8 +112,9 @@ def run() -> None:
 
     publish_ready = False
 
-    # 1) Record actual points for the most recently finished gameweek, as soon
-    #    as its last fixture has a score.
+    # 1) Record actual points for the most recently finished gameweek, once
+    #    FPL marks all of its fixtures finished (a live scoreline alone does
+    #    not count — games in progress already carry scores).
     if last_finished >= 1:
         y_path = config.DATA_DIR / f"y_{last_finished}.csv"
         if not y_path.exists():

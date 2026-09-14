@@ -42,13 +42,50 @@ def get_current_gameweek() -> int | None:
     return int(cur.iloc[0])
 
 
+def _fixtures_finished_mask(fixtures: pd.DataFrame) -> pd.Series:
+    """True for fixtures that have actually completed.
+
+    A live scoreline appears as soon as a game kicks off (and the
+    ``finished_provisional`` flag flips early too), so a present score alone
+    must not count as completion — only the fixture ``finished`` flag does.
+    """
+    if fixtures.empty:
+        return pd.Series([], dtype=bool)
+    finished_flag = (
+        fixtures["finished"].fillna(False).astype(bool)
+        if "finished" in fixtures.columns
+        else False
+    )
+    return (
+        (fixtures["started"] == True)
+        & fixtures["team_h_score"].notna()
+        & fixtures["team_a_score"].notna()
+        & finished_flag
+    )
+
+
+def is_gameweek_finished(gameweek: int) -> bool:
+    """Whether a gameweek is fully complete (safe to record actuals for)."""
+    events = pd.DataFrame(bootstrap()["events"])
+    row = events.loc[events["id"] == gameweek]
+    if not row.empty and bool(row.iloc[0]["finished"]):
+        return True
+
+    fixtures = pd.DataFrame(_get_json(f"{config.FPL_API}/fixtures/"))
+    grp = fixtures[fixtures["event"] == gameweek]
+    if len(grp) == 0:
+        return False
+    return bool(_fixtures_finished_mask(grp).all())
+
+
 def get_latest_finished_gameweek() -> int:
     """Most recent completed gameweek.
 
     The event-level ``finished`` flag can lag behind the actual results (it
     sometimes doesn't flip until the next gameweek begins), so we also derive
-    completion from fixture data (all fixtures kicked off + recorded a score)
-    and take the maximum of the two."""
+    completion from fixture data (every fixture finished) and take the maximum
+    of the two. Score presence alone is not completion: live games already
+    carry a scoreline."""
     events = pd.DataFrame(bootstrap()["events"])
     finished = events.loc[events["finished"] == True, "id"]
     event_max = int(finished.max()) if not finished.empty else 0
@@ -57,12 +94,7 @@ def get_latest_finished_gameweek() -> int:
     if fixtures.empty:
         return event_max
 
-    done = (
-        (fixtures["started"] == True)
-        & fixtures["team_h_score"].notna()
-        & fixtures["team_a_score"].notna()
-    )
-    fixtures = fixtures.assign(done=done)
+    fixtures = fixtures.assign(done=_fixtures_finished_mask(fixtures))
 
     completed = [
         int(gw)

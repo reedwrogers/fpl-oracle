@@ -224,9 +224,13 @@ def _evaluate(pred_df, gameweek, verbose=True):
     r2 = r2_score(scored["actual_points"], scored["predicted_points"])
     rho, p_value = spearmanr(scored["actual_points"], scored["predicted_points"])
 
-    top_predicted = set(scored.nlargest(20, "predicted_points")["full_name"])
-    top_actual = set(scored.nlargest(20, "actual_points")["full_name"])
-    overlap = len(top_predicted & top_actual)
+    def top_overlap(n):
+        top_p = set(scored.nlargest(n, "predicted_points")["full_name"])
+        top_a = set(scored.nlargest(n, "actual_points")["full_name"])
+        return len(top_p & top_a)
+
+    overlap = top_overlap(20)
+    overlap40 = top_overlap(40)
 
     def pos_summary(sub):
         if len(sub) == 0:
@@ -281,6 +285,7 @@ def _evaluate(pred_df, gameweek, verbose=True):
                 f"    6+ pts (haul) ({len(scored[scored['actual_points'] >= 6]):>3} players): MAE {t6:.2f}"
             )
         print(f"  Top-20 Precision: {overlap}/20 players correctly identified")
+        print(f"  Top-40 Precision: {overlap40}/40 players correctly identified")
 
     return {
         "gameweek": gameweek,
@@ -290,6 +295,7 @@ def _evaluate(pred_df, gameweek, verbose=True):
         "r2": _round(r2, 3),
         "spearman": _round(rho, 3),
         "top20_precision": f"{overlap}/20",
+        "top40_precision": f"{overlap40}/40",
         "by_position": by_position,
     }
 

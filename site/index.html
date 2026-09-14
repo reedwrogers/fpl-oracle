@@ -920,6 +920,7 @@ of the way a team name was being formatted. This was fixed!
         return {
           n: entry.n_players, mae: entry.mae, rmse: entry.rmse,
           r2: entry.r2, spearman: entry.spearman, top20: entry.top20_precision,
+          top40: entry.top40_precision,
         };
       }
       const p = (entry.by_position || {})[pos];
@@ -970,7 +971,8 @@ of the way a team name was being formatted. This was fixed!
             metricCard('Players', m.n, '');
           if (!pos) {
             cards += metricCard('R\u00B2', m.r2, m.r2 > 0.1 ? 'good' : m.r2 > -0.1 ? 'ok' : 'bad') +
-              metricCard('Top-20 Precision', '<b>' + m.top20 + '</b>', '');
+              metricCard('Top-20 Precision', '<b>' + m.top20 + '</b>', '') +
+              metricCard('Top-40 Precision', '<b>' + (m.top40 || '\u2014') + '</b>', '');
           }
           html += '<div class="metrics-grid">' + cards + '</div>';
         }
@@ -992,7 +994,7 @@ of the way a team name was being formatted. This was fixed!
           '<th>GW</th><th>Players</th><th>MAE</th><th>RMSE</th>' +
           (showExtras ? '<th>R\u00B2</th>' : '') +
           '<th>Spearman \u03C1</th>' +
-          (showExtras ? '<th>Top-20</th>' : '') +
+          (showExtras ? '<th>Top-20</th><th>Top-40</th>' : '') +
           '</tr></thead><tbody>';
 
         backtest.slice().reverse().forEach(row => {
@@ -1009,7 +1011,7 @@ of the way a team name was being formatted. This was fixed!
           }
           html += '<td class="' + cls + '">' + (m.spearman == null ? '\u2014' : m.spearman) + '</td>';
           if (showExtras) {
-            html += '<td><b>' + m.top20 + '</b></td>';
+            html += '<td><b>' + m.top20 + '</b></td><td><b>' + (m.top40 || '\u2014') + '</b></td>';
           }
           html += '</tr>';
         });
