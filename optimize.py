@@ -39,33 +39,92 @@ def load_long(gameweek, num_weeks):
 
     The pool is restricted to players who appear in the *current* gameweek's
     predictions, so the optimizer only considers the same "established" players
-    shown in the predictions table."""
-    from model import predict as model_predict
+    shown in the predictions table. Gameweeks without an ``X_<gw>.csv`` on disk
+    are built in memory from current form + that week's fixture context (same
+    approach as ``model.predict_future``) — never written to data/ — so a
+    multi-week horizon does not collapse to the weeks with files on disk."""
+    from model import predict as model_predict, _training_data, _fit
+
+    import features
 
     universe = None
     rows = []
+    _train_df = None
+    _model = None
+
+    def _shared_model():
+        nonlocal _train_df, _model
+        if _model is None:
+            _train_df = _training_data(exclude_gw=None)
+            _model = _fit(_train_df, verbose=False)
+        return _train_df, _model
+
     for gw in range(gameweek, gameweek + num_weeks):
         x_path = os.path.join(DATA_DIR, f"X_{gw}.csv")
-        if not os.path.exists(x_path):
-            print(f"  X_{gw}.csv missing, skipping")
+        if os.path.exists(x_path):
+            X = pd.read_csv(x_path)
+            pred_df, _ = model_predict(gw, verbose=False)
+            if universe is None:
+                universe = set(pred_df["full_name"])
+            merged = pred_df.merge(
+                X[["full_name", "current_fpl_cost"]], on="full_name", how="left"
+            )
+            merged["gameweek"] = gw
+            rows.append(
+                merged[
+                    [
+                        "full_name", "position", "team_name",
+                        "current_fpl_cost", "gameweek", "predicted_points",
+                    ]
+                ]
+            )
+            print(f"  GW {gw}: {len(merged)} players predicted")
             continue
-        X = pd.read_csv(x_path)
-        pred_df, _ = model_predict(gw, verbose=False)
+        try:
+            frame = features.build_features(gw)
+        except Exception as e:
+            print(f"  GW{gw} lookahead skipped: {e}")
+            continue
         if universe is None:
-            universe = set(pred_df["full_name"])
-        merged = pred_df.merge(
-            X[["full_name", "current_fpl_cost"]], on="full_name", how="left"
-        )
-        merged["gameweek"] = gw
+            universe = set(frame["full_name"])
+        sub = frame[frame["full_name"].isin(universe)].copy()
+        if sub.empty:
+            print(f"  GW{gw} lookahead skipped: no overlap with current pool")
+            continue
+        try:
+            train_df, shared = _shared_model()
+        except Exception as e:
+            print(f"  GW{gw} lookahead skipped: {e}")
+            continue
+        feat_cols = [
+            c for c in train_df.drop(
+                columns=["gw_points", "gw_minutes", "full_name", "gameweek"]
+            ).columns
+            if c in sub.columns
+        ]
+        if not feat_cols:
+            print(f"  GW{gw} lookahead skipped: no shared feature columns")
+            continue
+        try:
+            preds = np.round(np.asarray(shared.predict(sub[feat_cols])), 2)
+        except Exception as e:
+            print(f"  GW{gw} lookahead skipped: {e}")
+            continue
+        meta = sub[
+            ["full_name", "team_name", "player_position", "current_fpl_cost"]
+        ].copy()
+        meta = meta.rename(columns={"player_position": "position"})
+        meta["predicted_points"] = preds
+        meta["gameweek"] = gw
         rows.append(
-            merged[
+            meta[
                 [
                     "full_name", "position", "team_name",
                     "current_fpl_cost", "gameweek", "predicted_points",
                 ]
             ]
         )
-        print(f"  GW {gw}: {len(merged)} players predicted")
+        print(f"  GW {gw}: {len(meta)} players predicted (in-memory lookahead)")
 
     df = pd.concat(rows, ignore_index=True)
     if universe:
