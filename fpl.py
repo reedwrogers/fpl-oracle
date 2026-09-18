@@ -131,6 +131,10 @@ def last_slot_fulltime_observed(gameweek: int) -> bool:
             continue
 
     live = _get_json(f"{config.FPL_API}/event/{gameweek}/live/")
+    if not isinstance(live, dict):
+        # FPL serves a bare JSON string (e.g. "The game is being updated.")
+        # while the game updates — no signal, retry on the next cron run.
+        return False
     fulltime_teams = set()
     for el in live.get("elements", []):
         try:

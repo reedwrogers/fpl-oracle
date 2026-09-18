@@ -86,6 +86,21 @@ def test_signal_when_last_slot_has_90(monkeypatch):
     assert fpl.last_slot_fulltime_observed(4) is True
 
 
+def test_updating_game_returns_no_signal(monkeypatch):
+    """FPL serves a bare string while updating — must not crash the run."""
+    def fake_get_json(url: str):
+        if url.endswith("/bootstrap-static/"):
+            return _bootstrap("")
+        if url.endswith("/fixtures/"):
+            return _fixtures("2026-09-14T19:00:00Z")
+        if url.endswith("/event/4/live/"):
+            return "The game is being updated."
+        raise AssertionError(f"unexpected URL {url}")
+
+    monkeypatch.setattr(fpl, "_get_json", fake_get_json)
+    assert fpl.last_slot_fulltime_observed(4) is False
+
+
 def test_bonus_delay_gates_readiness(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "DATA_DIR", tmp_path)
     now = datetime.now(timezone.utc)
