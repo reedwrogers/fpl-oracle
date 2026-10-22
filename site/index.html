@@ -159,10 +159,35 @@
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
+      align-items: center;
       margin: 10px 12px 0;
       font-size: 0.78em;
       color: #999;
     }
+
+    #squad-filter-btn {
+      background: transparent;
+      color: #aaa;
+      border: 1px solid #333;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1em;
+      white-space: nowrap;
+      margin-left: auto;
+    }
+
+    #squad-filter-btn:hover:not(:disabled) { color: #F28C28; border-color: #F28C28; }
+
+    #squad-filter-btn.active {
+      background: #F28C28;
+      color: #111;
+      font-weight: bold;
+      border-color: #F28C28;
+    }
+
+    #squad-filter-btn:disabled { opacity: 0.5; cursor: default; }
 
     .legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
     .legend-item i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
@@ -420,6 +445,7 @@
         <span class="legend-item grp-player"><i></i>Player</span>
         <span class="legend-item grp-stats"><i></i>Statistics</span>
         <span class="legend-item grp-fixture"><i></i>Fixture</span>
+        <button id="squad-filter-btn" type="button" title="Show only players in my current squad" disabled>My squad only</button>
       </div>
       <div id="predictions-container">
         <table id="predictions-table">
@@ -703,6 +729,8 @@ of the way a team name was being formatted. This was fixed!
     let sortColumn = null;
     let sortAscending = true;
     let columnFilters = {}; // column index -> filter string
+    let squadOnly = false;
+    let squadNames = new Set();
 
     // Column groups: prediction (the model output), player (identity),
     // stats (per-player numbers), fixture (match context). Anything not
@@ -812,6 +840,7 @@ of the way a team name was being formatted. This was fixed!
         input.addEventListener('input', () => {
           columnFilters[i] = input.value;
           renderBody();
+          updateStatusBar();
         });
         th.appendChild(input);
         filterRow.appendChild(th);
@@ -843,6 +872,10 @@ of the way a team name was being formatted. This was fixed!
     }
 
     function matchesFilters(row) {
+      if (squadOnly && squadNames.size > 0) {
+        const nameIdx = currentHeaders.indexOf('full_name');
+        if (nameIdx >= 0 && !squadNames.has(row[nameIdx])) return false;
+      }
       for (const i in columnFilters) {
         const f = (columnFilters[i] || '').trim();
         if (!f) continue;
@@ -889,10 +922,24 @@ of the way a team name was being formatted. This was fixed!
       if (!currentHeaders.length || !currentRows.length) return;
       const gwIdx = currentHeaders.indexOf('gameweek');
       const gw = gwIdx >= 0 ? currentRows[0][gwIdx] : '';
+      const visible = currentRows.filter(row => matchesFilters(row)).length;
+      const countLabel = (squadOnly && squadNames.size > 0)
+        ? visible + ' of ' + currentRows.length + ' players · my squad'
+        : currentRows.length + ' players';
       bar.innerHTML =
         '<span class="status-badge">Gameweek ' + gw + '</span>' +
-        '<span class="status-badge">' + currentRows.length + ' players</span>' +
+        '<span class="status-badge">' + countLabel + '</span>' +
         '<span class="status-badge">Model predictions</span>';
+    }
+
+    function updateSquadButton() {
+      const btn = document.getElementById('squad-filter-btn');
+      if (!btn) return;
+      btn.disabled = squadNames.size === 0;
+      btn.classList.toggle('active', squadOnly);
+      btn.textContent = squadOnly
+        ? 'My squad only ✓'
+        : (squadNames.size > 0 ? 'My squad only (' + squadNames.size + ')' : 'My squad only');
     }
 
     // --- Metrics dashboard ---
@@ -1262,6 +1309,15 @@ of the way a team name was being formatted. This was fixed!
 
       c.innerHTML += '<div class="squad-meta" style="margin-top:10px;"><span style="font-weight:bold;color:#F28C28;">Bench</span></div>';
       c.innerHTML += playerTable(data.bench);
+
+      squadNames = new Set(
+        (data.starters || []).concat(data.bench || []).map(p => p.name).filter(Boolean)
+      );
+      updateSquadButton();
+      if (currentHeaders.length && currentRows.length) {
+        renderBody();
+        updateStatusBar();
+      }
     }
 
     function playerTable(players) {
@@ -1402,6 +1458,15 @@ of the way a team name was being formatted. This was fixed!
         transfersCount = tab.dataset.n || '1';
         renderTransfers();
       }
+    });
+
+    // Squad-only toggle for the main predictions table.
+    document.getElementById('squad-filter-btn').addEventListener('click', () => {
+      if (squadNames.size === 0) return;
+      squadOnly = !squadOnly;
+      updateSquadButton();
+      renderBody();
+      updateStatusBar();
     });
 
     loadCSV();
