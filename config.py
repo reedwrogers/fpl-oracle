@@ -143,6 +143,11 @@ FULLTIME_BONUS_DELAY_HOURS = 4
 
 # --- Feature engineering knobs ----------------------------------------------
 
+# Availability flags (player_status, chance_of_playing_*): when False, X files
+# carry all-available defaults and the model behaves as if unflagged. Flip to
+# True (and rebuild X) to let injury/doubt flags gate predictions.
+USE_AVAILABILITY_FLAGS = False
+
 # Players no longer on any FPL team (left the league/club) and still listed in
 # the API. Excluded from feature generation so they never enter predictions,
 # training pairs, or the recommended squad.
@@ -169,6 +174,9 @@ PER_90_COLS = [
     "creativity_per_90",
     "threat_per_90",
     "ict_per_90",
+    "player_status",
+    "chance_of_playing_this_round",
+    "chance_of_playing_next_round",
 ]
 
 # Canonical schema for every X_*.csv. Feature builders must produce exactly

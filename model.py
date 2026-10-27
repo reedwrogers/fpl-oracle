@@ -7,9 +7,11 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.ensemble import (
+    HistGradientBoostingClassifier,
+    HistGradientBoostingRegressor,
+)
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from scipy.stats import spearmanr
 
@@ -76,11 +78,72 @@ def _training_data(exclude_gw: int | None = None) -> pd.DataFrame:
     return pd.concat(merged_dfs, ignore_index=True)
 
 
-def _fit(train_df: pd.DataFrame, verbose: bool = True) -> Pipeline:
-    X_train = train_df.drop(columns=["gw_points", "gw_minutes", "full_name", "gameweek"])
-    y_train = train_df["gw_points"]
+CATEGORICAL = ["team_name", "player_position", "player_status"]
+CHANCE_COLS = ["chance_of_playing_this_round", "chance_of_playing_next_round"]
+# A missing flag (pre-flag X files, unflagged players) means available.
+STATUS_DEFAULT = "a"
+CHANCE_DEFAULT = 100.0
+NON_FEATURE_COLS = ["gw_points", "gw_minutes", "full_name", "gameweek"]
 
-    categorical = ["team_name", "player_position"]
+
+def _prepare_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Feature frame ready for the preprocessor.
+
+    Normalises the availability flags (missing column or value = available)
+    and drops targets/ids. Tolerates frames that predate the flags or carry
+    only a subset of columns (e.g. in-memory lookahead frames).
+    """
+    df = df.copy()
+    if "player_status" not in df.columns:
+        df["player_status"] = STATUS_DEFAULT
+    else:
+        df["player_status"] = df["player_status"].fillna(STATUS_DEFAULT)
+    for col in CHANCE_COLS:
+        if col not in df.columns:
+            df[col] = CHANCE_DEFAULT
+        else:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(CHANCE_DEFAULT)
+    drop = [c for c in NON_FEATURE_COLS if c in df.columns]
+    return df.drop(columns=drop)
+
+
+class TwoStageModel:
+    """P(plays) x E(points | plays).
+
+    Stage A gates on availability: a flagged doubt outputs near-zero even
+    when stage B (trained only on appearances) rates the player highly.
+    Exposes the same ``predict(DataFrame)`` interface as the old Pipeline.
+    """
+
+    def __init__(self, preprocessor, clf, reg, feature_names):
+        self.preprocessor = preprocessor
+        self.clf = clf
+        self.reg = reg
+        self.feature_names = list(feature_names)
+
+    def predict(self, X: pd.DataFrame) -> np.ndarray:
+        Xp = _prepare_features(X)
+        for c in self.feature_names:
+            if c not in Xp.columns:
+                Xp[c] = np.nan
+        Xt = self.preprocessor.transform(Xp[self.feature_names])
+        if len(self.clf.classes_) == 1:
+            p = (
+                np.ones(len(Xt))
+                if self.clf.classes_[0] == 1
+                else np.zeros(len(Xt))
+            )
+        else:
+            p = self.clf.predict_proba(Xt)[:, list(self.clf.classes_).index(1)]
+        return np.asarray(p) * np.asarray(self.reg.predict(Xt))
+
+
+def _fit(train_df: pd.DataFrame, verbose: bool = True) -> TwoStageModel:
+    X_train = _prepare_features(train_df)
+    y_points = train_df["gw_points"].to_numpy()
+    played = (train_df["gw_minutes"].to_numpy() > 0).astype(int)
+
+    categorical = [c for c in CATEGORICAL if c in X_train.columns]
     numeric = X_train.columns.difference(categorical)
 
     preprocessor = ColumnTransformer(
@@ -89,34 +152,39 @@ def _fit(train_df: pd.DataFrame, verbose: bool = True) -> Pipeline:
             ("num", "passthrough", numeric),
         ]
     )
+    Xt = preprocessor.fit_transform(X_train)
 
-    model = Pipeline(
-        steps=[
-            ("prep", preprocessor),
-            (
-                "model",
-                # Rank-tuned hyperparams (Study B winner, seed 42, 20 trials):
-                # selected on mean Spearman under leave-one-gameweek-out
-                # backtest. See experiments/rank_vs_mae.py + champ_params.json.
-                HistGradientBoostingRegressor(
-                    learning_rate=0.009930253316028368,
-                    max_depth=2,
-                    max_iter=496,
-                    min_samples_leaf=18,
-                    l2_regularization=3.4019540836694557,
-                    random_state=42,
-                ),
-            ),
-        ]
+    clf = HistGradientBoostingClassifier(
+        max_iter=200,
+        max_depth=2,
+        min_samples_leaf=20,
+        random_state=42,
     )
+    clf.fit(Xt, played)
 
-    model.fit(X_train, y_train)
+    mask = played == 1
+    if mask.sum() == 0:  # degenerate: no appearances; fall back to all rows
+        mask = np.ones(len(played), dtype=bool)
+    reg = HistGradientBoostingRegressor(
+        # Rank-tuned hyperparams (Study B winner, seed 42, 20 trials):
+        # selected on mean Spearman under leave-one-gameweek-out
+        # backtest. See experiments/rank_vs_mae.py + champ_params.json.
+        learning_rate=0.009930253316028368,
+        max_depth=2,
+        max_iter=496,
+        min_samples_leaf=18,
+        l2_regularization=3.4019540836694557,
+        random_state=42,
+    )
+    reg.fit(Xt[mask], y_points[mask])
+
     if verbose:
         print(
             f"Training on {len(train_df)} instances "
+            f"({mask.sum()} appearances) "
             f"across {train_df['gameweek'].nunique()} gameweeks"
         )
-    return model
+    return TwoStageModel(preprocessor, clf, reg, list(X_train.columns))
 
 
 def predict(gameweek: int, verbose: bool = True):

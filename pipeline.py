@@ -239,6 +239,8 @@ def backfill() -> None:
         "influence_per_90", "creativity_per_90", "threat_per_90", "ict_per_90",
         "clearances_blocks_interceptions_per_90", "tackles_per_90",
         "gameweek", "is_at_home", "team_league_position", "opponent_league_position",
+        "player_status", "chance_of_playing_this_round",
+        "chance_of_playing_next_round",
     ]
 
     import understat
@@ -258,7 +260,11 @@ def backfill() -> None:
         existing = pd.read_csv(prev_path)
         print(f"\nRebuilding GW {gw} ({len(existing)} rows)...")
 
-        df = existing[fpl_base_cols].copy()
+        # Older X files predate the availability flags; reindex tolerates the
+        # missing columns and defaults mark those rows as available.
+        df = features._fill_availability_defaults(
+            existing.reindex(columns=fpl_base_cols).copy()
+        )
 
         match_map = features._match_map(
             df["full_name"].tolist(), df_understat["player_name"].tolist()

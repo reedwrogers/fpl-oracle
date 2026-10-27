@@ -162,9 +162,16 @@ def get_players() -> pd.DataFrame:
     players["team_name"] = players["team"].map(teams)
     players["position"] = players["element_type"].map(positions)
     players["full_name"] = players["first_name"] + " " + players["second_name"]
+    # Availability flags (None = no concern reported). Coerced to numeric here;
+    # builders fill missing values with "available" defaults.
+    players["player_status"] = players["status"]
+    for col in ("chance_of_playing_this_round", "chance_of_playing_next_round"):
+        players[col] = pd.to_numeric(players[col], errors="coerce")
 
     return players[
-        ["id", "first_name", "second_name", "team_name", "position", "now_cost", "full_name"]
+        ["id", "first_name", "second_name", "team_name", "position", "now_cost",
+         "full_name", "player_status",
+         "chance_of_playing_this_round", "chance_of_playing_next_round"]
     ]
 
 

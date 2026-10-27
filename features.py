@@ -152,6 +152,10 @@ def build_features(gameweek: int, season: str = config.SEASON) -> pd.DataFrame:
     })
 
     df = df.loc[:, ~df.columns.duplicated()]
+    # Availability flags: None in the API means no concern reported, i.e.
+    # available. Fill before the schema cut so every X file is complete.
+    df = _fill_availability_defaults(df)
+
     df = df[~df["full_name"].isin(config.EXCLUDED_PLAYERS)].copy()
     if "total_minutes" in df.columns:
         df = df[df["total_minutes"] >= config.MIN_TOTAL_MINUTES]
@@ -159,6 +163,29 @@ def build_features(gameweek: int, season: str = config.SEASON) -> pd.DataFrame:
     df = cap_per_90_outliers(df)
 
     return df[config.FEATURE_COLUMNS]
+
+
+def _fill_availability_defaults(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalise availability flags (missing column or value = available).
+
+    With USE_AVAILABILITY_FLAGS off, real flag values are replaced by
+    all-available defaults so predictions ignore them entirely.
+    """
+    if not config.USE_AVAILABILITY_FLAGS:
+        df["player_status"] = "a"
+        df["chance_of_playing_this_round"] = 100.0
+        df["chance_of_playing_next_round"] = 100.0
+        return df
+    if "player_status" not in df.columns:
+        df["player_status"] = "a"
+    else:
+        df["player_status"] = df["player_status"].fillna("a")
+    for col in ("chance_of_playing_this_round", "chance_of_playing_next_round"):
+        if col not in df.columns:
+            df[col] = 100.0
+        else:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(100.0)
+    return df
 
 
 def _load_preseason_shared() -> dict:
@@ -183,6 +210,12 @@ def _load_preseason_shared() -> dict:
     fpl_df["threat_per_90"] = fpl_df["threat"].astype(float) * per_90
     fpl_df["ict_per_90"] = fpl_df["ict_index"].astype(float) * per_90
     fpl_df["is_penalty_taker"] = fpl_df["penalties_order"].isin([1.0, 2.0]).astype(int)
+    fpl_df["player_status"] = fpl_df["status"] if "status" in fpl_df.columns else "a"
+    for col in ("chance_of_playing_this_round", "chance_of_playing_next_round"):
+        if col in fpl_df.columns:
+            fpl_df[col] = pd.to_numeric(fpl_df[col], errors="coerce")
+        else:
+            fpl_df[col] = np.nan
 
     print("Fetching prior-season Understat player data...")
     u_df = understat.get_player_stats(season=config.PRIOR_SEASON)
@@ -226,6 +259,8 @@ def build_preseason_features(gameweek: int, shared: dict | None = None) -> pd.Da
         "full_name", "team_name", "player_position", "current_fpl_cost",
         "selected_by_percent", "total_minutes", "influence_per_90",
         "creativity_per_90", "threat_per_90", "ict_per_90", "is_penalty_taker",
+        "player_status", "chance_of_playing_this_round",
+        "chance_of_playing_next_round",
     ]].copy()
 
     df["_match"] = df["full_name"].map(shared["match_map"])
@@ -285,6 +320,8 @@ def build_preseason_features(gameweek: int, shared: dict | None = None) -> pd.Da
         df[col] = 0
 
     df["ownership_percent"] = fpl_df["selected_by_percent"].astype(float)
+
+    df = _fill_availability_defaults(df)
 
     df = df[~df["full_name"].isin(config.EXCLUDED_PLAYERS)].copy()
     if "total_minutes" in df.columns:
